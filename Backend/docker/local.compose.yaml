@@ -1,0 +1,50 @@
+name: ecommerce-backend
+services:
+    app:
+        environment:
+            - LOGGING_LEVEL_ROOT
+            - SPRING_DATASOURCE_PASSWORD
+            - SPRING_DATASOURCE_URL
+            - SPRING_DATASOURCE_USERNAME
+            - SPRING_JPA_HIBERNATE_DDLAUTO
+            - SPRINGDOC_APIDOCS_ENABLED
+        build:
+            context: ..
+            dockerfile: docker/local.Dockerfile
+        image: firo1919/ecommerce-backend:local
+        networks:
+            - local-net
+        ports:
+            - "8080:8080"
+        volumes:
+            - ../:/app
+        depends_on:
+            db:
+                condition: service_healthy
+                restart: true
+    db:
+        image: "mariadb:latest"
+        environment:
+            - MARIADB_DATABASE
+            - MARIADB_PASSWORD
+            - MARIADB_ROOT_PASSWORD
+            - MARIADB_USER
+        restart: always
+        volumes:
+            - db_local_data:/var/lib/mysql
+        networks:
+            - local-net
+        healthcheck:
+            test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
+        ports:
+            - "3306:3306"
+
+volumes:
+    db_local_data:
+
+networks:
+    local-net:

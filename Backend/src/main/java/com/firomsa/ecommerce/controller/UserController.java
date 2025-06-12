@@ -1,15 +1,12 @@
 package com.firomsa.ecommerce.controller;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,61 +14,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.firomsa.ecommerce.model.User;
+import com.firomsa.ecommerce.dto.UserRequestDTO;
+import com.firomsa.ecommerce.dto.UserResponseDTO;
 import com.firomsa.ecommerce.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
+@Tag(name = "User", description = "API for managing users")
 public class UserController {
 
-    @Autowired
     private UserService userService;
 
-    @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(){
-        return new ResponseEntity<List<User>>(userService.getAll(), HttpStatus.OK);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/users/{id}")
-    public ResponseEntity<User> getUser(@PathVariable int id){
-        Optional<User> user = userService.get(id);
-        if(user.isPresent()){
-            return new ResponseEntity<User>(user.get(), HttpStatus.OK);
+    @GetMapping()
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<UserResponseDTO> users = userService.getUsers();
+        return ResponseEntity.ok().body(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUser(@PathVariable UUID id) {
+        Optional<UserResponseDTO> user = userService.getUser(id);
+        if (user.isPresent()) {
+            return ResponseEntity.ok().body(user.get());
         }
 
-        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.notFound().build();
     }
 
-
-    @PostMapping("/users")
-    public ResponseEntity<User> addUser(@RequestBody User user){
-        return new ResponseEntity<>(userService.add(user), HttpStatus.OK);
+    @PostMapping()
+    public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+        UserResponseDTO userResponseDTO = userService.createUser(userRequestDTO);
+        return ResponseEntity.created(null).body(userResponseDTO);
     }
 
-    @PatchMapping("/users/{id}")
-    public ResponseEntity<User> partialUpdateUser(@RequestBody Map<String, Object> userDetails, @PathVariable int id){
-        Optional<User> u = userService.partialUpdate(userDetails, id);
-        if(u.isPresent()){
-            return new ResponseEntity<User>(u.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserRequestDTO userRequestDTO, @PathVariable UUID id) {
+        return ResponseEntity.ok().body(userService.updateUser(userRequestDTO, id));
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable int id){
-        if(userService.remove(id)){
-            return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        userService.removeUser(id);
+        return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable int id){
-        Optional<User> u = userService.update(user, id);
-        if(u.isPresent()){
-            return new ResponseEntity<User>(u.get(), HttpStatus.OK);
-        }
-        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
-}
 }

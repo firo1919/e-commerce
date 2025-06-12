@@ -2,84 +2,71 @@ package com.firomsa.ecommerce.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.firomsa.ecommerce.dto.UserRequestDTO;
+import com.firomsa.ecommerce.dto.UserResponseDTO;
+import com.firomsa.ecommerce.exception.EmailAlreadyExistsException;
+import com.firomsa.ecommerce.exception.UserNotFoundException;
+import com.firomsa.ecommerce.mapper.UserMapper;
 import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.UserRepository;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
     
-    public List<User> getAll(){
-        return userRepository.findAll();
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public Optional<User> get(int id) {
-        return userRepository.findById(id);
+    public List<UserResponseDTO> getUsers(){
+        return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
     }
 
-    public User add(User user){
-        user.setCreatedAt(LocalDateTime.now());
+    public Optional<UserResponseDTO> getUser(UUID id) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            return Optional.of(UserMapper.toDTO(user.get()));
+        };
+
+        return Optional.empty();
+    }
+
+    public UserResponseDTO createUser(UserRequestDTO userRequestDTO){
+        if(userRepository.existsByEmail(userRequestDTO.getEmail())){
+            throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
+        }
+        return UserMapper.toDTO(userRepository.save(UserMapper.toModel(userRequestDTO)));
+    }
+
+    public UserResponseDTO updateUser(UserRequestDTO userRequestDTO, UUID id){
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            throw new UserNotFoundException(id.toString());
+        });
+
+        if(userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)){
+            throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
+        }
+
+        user.setLastName(userRequestDTO.getLastName());
+        user.setFirstName(userRequestDTO.getFirstName());
+        user.setUserName(userRequestDTO.getUserName());
+        user.setEmail(userRequestDTO.getEmail());
+        user.setPassword(userRequestDTO.getPassword());
         user.setUpdatedAt(LocalDateTime.now());
-        return userRepository.save(user);
+
+        return  UserMapper.toDTO(userRepository.save(user));
     }
 
-    public Optional<User> update(User newUser, int id){
-        Optional<User> user = this.get(id);
-        if(user.isPresent()){
-            User existingUser = user.get();
-            newUser.setId(id);
-            newUser.setCreatedAt(existingUser.getCreatedAt());
-            newUser.setUpdatedAt(LocalDateTime.now());
-            return Optional.of(userRepository.save(newUser));
-        }
-
-        return Optional.empty();
-    }
-
-    public boolean remove(int id){
-        Optional<User> user = this.get(id);
-        if(user.isPresent()){
-            userRepository.delete(user.get());
-            return true;
-        }
-        return false;
-    }
-
-    public Optional<User> partialUpdate(Map<String, Object> userDetails, int id) {
-        Optional<User> user = this.get(id);
-        if (user.isPresent()) {
-            User existingUser = user.get();
-            userDetails.forEach((key, value) -> {
-                switch (key) {
-                    case "userName":
-                        existingUser.setUserName((String) value);
-                        break;
-                    case "email":
-                        existingUser.setEmail((String) value);
-                        break;
-                    case "password":
-                        existingUser.setPassword((String) value);
-                        break;
-                    case "firstName":
-                        existingUser.setFirstName((String) value);
-                        break;
-                    case "lastName":
-                        existingUser.setLastName((String) value);
-                        break;
-                }
-            });
-
-            existingUser.setUpdatedAt(LocalDateTime.now());
-            return Optional.of(userRepository.save(existingUser));
-        }
-        return Optional.empty();
+    public void removeUser(UUID id){
+        User user = userRepository.findById(id).orElseThrow(() ->{
+            throw new UserNotFoundException(id.toString());
+        });
+        userRepository.delete(user);
     }
 }
