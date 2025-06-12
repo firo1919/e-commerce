@@ -29,4 +29,12 @@ public class UserRequestDTO {
     @NotBlank(message = "LastName is required")
     @Size(max = 100, message = "LastName cannot exceed 100 characters")
     private String lastName;
+
+    @NotBlank(message = "Role is required")
+    @Size(max = 100, message = "Role cannot exceed 100 characters")
+    private String role;
+
+    @NotBlank(message = "isActive is required")
+    @Size(max = 100, message = "LastName cannot exceed 100 characters")
+    private String isActive;
 }

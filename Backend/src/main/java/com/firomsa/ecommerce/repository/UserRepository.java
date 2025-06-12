@@ -11,4 +11,5 @@ import com.firomsa.ecommerce.model.User;
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByEmail(String email);
     boolean existsByEmailAndIdNot(String email, UUID id);
+    boolean existsByUserName(String userName);
 }

@@ -1,7 +1,6 @@
 package com.firomsa.ecommerce.controller;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -40,12 +39,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUser(@PathVariable UUID id) {
-        Optional<UserResponseDTO> user = userService.getUser(id);
-        if (user.isPresent()) {
-            return ResponseEntity.ok().body(user.get());
-        }
-
-        return ResponseEntity.notFound().build();
+        UserResponseDTO user = userService.getUser(id);
+        return ResponseEntity.ok().body(user);
     }
 
     @PostMapping()
@@ -56,7 +51,8 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserRequestDTO userRequestDTO, @PathVariable UUID id) {
-        return ResponseEntity.ok().body(userService.updateUser(userRequestDTO, id));
+        UserResponseDTO userResponseDTO = userService.updateUser(userRequestDTO, id);
+        return ResponseEntity.ok().body(userResponseDTO);
     }
 
     @DeleteMapping("/{id}")

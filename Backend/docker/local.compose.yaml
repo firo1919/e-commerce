@@ -22,6 +22,13 @@ services:
             db:
                 condition: service_healthy
                 restart: true
+    adminer:
+        image: adminer
+        networks:
+            - local-net
+        restart: unless-stopped
+        ports:
+            - 8081:8080
     db:
         image: "mariadb:latest"
         environment:
@@ -29,19 +36,19 @@ services:
             - MARIADB_PASSWORD
             - MARIADB_ROOT_PASSWORD
             - MARIADB_USER
-        restart: always
+        restart: unless-stopped
         volumes:
             - db_local_data:/var/lib/mysql
         networks:
             - local-net
         healthcheck:
             test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-            interval: 10s
+            interval: 20s
             timeout: 5s
             retries: 5
             start_period: 20s
         ports:
-            - "3306:3306"
+            - "3306"
 
 volumes:
     db_local_data:
