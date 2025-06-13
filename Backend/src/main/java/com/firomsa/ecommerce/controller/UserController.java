@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 @Tag(name = "User", description = "API for managing users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -46,7 +46,7 @@ public class UserController {
     @PostMapping()
     public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
         UserResponseDTO userResponseDTO = userService.createUser(userRequestDTO);
-        return ResponseEntity.created(null).body(userResponseDTO);
+        return ResponseEntity.ok().body(userResponseDTO);
     }
 
     @PutMapping("/{id}")

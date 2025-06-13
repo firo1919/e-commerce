@@ -19,7 +19,7 @@ import com.firomsa.ecommerce.repository.UserRepository;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -30,9 +30,7 @@ public class UserService {
     }
 
     public UserResponseDTO getUser(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> {
-            throw new UserNotFoundException(id.toString());
-        });
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
         return UserMapper.toDTO(user);
     }
 
@@ -49,9 +47,7 @@ public class UserService {
     }
 
     public UserResponseDTO updateUser(UserRequestDTO userRequestDTO, UUID id){
-        User user = userRepository.findById(id).orElseThrow(() -> {
-            throw new UserNotFoundException(id.toString());
-        });
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
 
         if(userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)){
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
@@ -74,16 +70,12 @@ public class UserService {
     }
 
     public void removeUser(UUID id){
-        User user = userRepository.findById(id).orElseThrow(() ->{
-            throw new UserNotFoundException(id.toString());
-        });
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
         userRepository.delete(user);
     }
 
     public void softDeleteUser(UUID id){
-        User user = userRepository.findById(id).orElseThrow(() ->{
-            throw new UserNotFoundException(id.toString());
-        });
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id.toString()));
         user.setActive(false);
         userRepository.save(user);
     }
