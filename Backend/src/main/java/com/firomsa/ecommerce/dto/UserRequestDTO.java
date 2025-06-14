@@ -3,11 +3,13 @@ package com.firomsa.ecommerce.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
+@Builder
 public class UserRequestDTO {
 
     @NotBlank(message = "UserName is required")
@@ -29,12 +31,4 @@ public class UserRequestDTO {
     @NotBlank(message = "LastName is required")
     @Size(max = 100, message = "LastName cannot exceed 100 characters")
     private String lastName;
-
-    @NotBlank(message = "Role is required")
-    @Size(max = 100, message = "Role cannot exceed 100 characters")
-    private String role;
-
-    @NotBlank(message = "isActive is required")
-    @Size(max = 100, message = "LastName cannot exceed 100 characters")
-    private String isActive;
 }
