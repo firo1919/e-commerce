@@ -42,7 +42,25 @@ public class UserService {
         if(userRepository.existsByUserName(userRequestDTO.getUserName())){
             throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
         }
-        User user = userRepository.save(UserMapper.toModel(userRequestDTO));
+        User model = UserMapper.toModel(userRequestDTO);
+        model.setRole(Role.CUSTOMER);
+        model.setActive(true);
+        User user = userRepository.save(model);
+        return UserMapper.toDTO(user);
+    }
+
+    public UserResponseDTO createAdmin(UserRequestDTO userRequestDTO){
+        if(userRepository.existsByEmail(userRequestDTO.getEmail())){
+            throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
+        }
+
+        if(userRepository.existsByUserName(userRequestDTO.getUserName())){
+            throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
+        }
+        User model = UserMapper.toModel(userRequestDTO);
+        model.setRole(Role.ADMIN);
+        model.setActive(true);
+        User user = userRepository.save(model);
         return UserMapper.toDTO(user);
     }
 
@@ -62,8 +80,6 @@ public class UserService {
         user.setUserName(userRequestDTO.getUserName());
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(userRequestDTO.getPassword());
-        user.setActive(Boolean.parseBoolean(userRequestDTO.getIsActive()));
-        user.setRole(Enum.valueOf(Role.class, userRequestDTO.getRole()));
         user.setUpdatedAt(LocalDateTime.now());
 
         return  UserMapper.toDTO(userRepository.save(user));
