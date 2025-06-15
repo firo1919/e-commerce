@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,9 +55,15 @@ public class UserServiceTests {
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
 
-        UserResponseDTO userResponseDTO = userService.getUser(user.getId());
-        assertThat(userResponseDTO).isNotNull();
-        assertThat(userResponseDTO.getId()).isEqualTo(user.getId().toString());
+        UserResponseDTO responseDTO = userService.getUser(user.getId());
+        assertThat(responseDTO).isNotNull();
+        assertThat(responseDTO.getId()).isEqualTo(user.getId().toString());
+        assertThat(responseDTO.getEmail()).isEqualTo(user.getEmail());
+        assertThat(responseDTO.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(responseDTO.getLastName()).isEqualTo(user.getLastName());
+        assertThat(responseDTO.getRole()).isEqualTo(user.getRole().toString());
+        assertThat(responseDTO.getIsActive()).isEqualTo(Boolean.toString(user.isActive()));
+        assertThat(responseDTO.getUserName()).isEqualTo(user.getUserName());
     }
 
     @Test
@@ -78,6 +83,12 @@ public class UserServiceTests {
 
         assertThat(responseDTO).isNotNull();
         assertThat(responseDTO.getId()).isEqualTo(userResponseDTO.getId());
+        assertThat(responseDTO.getEmail()).isEqualTo(userResponseDTO.getEmail());
+        assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
+        assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
+        assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
+        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getIsActive()).isEqualTo(userResponseDTO.getIsActive());
     }
 
     @Test
@@ -97,6 +108,12 @@ public class UserServiceTests {
 
         assertThat(responseDTO).isNotNull();
         assertThat(responseDTO.getId()).isEqualTo(userResponseDTO.getId());
+        assertThat(responseDTO.getEmail()).isEqualTo(userResponseDTO.getEmail());
+        assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
+        assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
+        assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
+        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getIsActive()).isEqualTo(userResponseDTO.getIsActive());
     }
 
     @Test
@@ -116,6 +133,12 @@ public class UserServiceTests {
 
         assertThat(responseDTO).isNotNull();
         assertThat(responseDTO.getId()).isEqualTo(userResponseDTO.getId());
+        assertThat(responseDTO.getEmail()).isEqualTo(userResponseDTO.getEmail());
+        assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
+        assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
+        assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
+        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getIsActive()).isEqualTo(userResponseDTO.getIsActive());
     }
 
     @Test
@@ -127,6 +150,8 @@ public class UserServiceTests {
                 .firstName("Firomsa")
                 .lastName("Assefa")
                 .password("123")
+                .role(Role.CUSTOMER)
+                .isActive(true)
                 .build();
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));

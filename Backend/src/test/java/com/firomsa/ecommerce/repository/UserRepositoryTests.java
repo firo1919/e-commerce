@@ -111,6 +111,17 @@ public class UserRepositoryTests {
 
         assertThat(userRepository.existsById(savedUser.getId())).isFalse();
     }
+
+    @Test
+    public void UserRepository_Delete_DeleteUser(){
+        User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
+        User savedUser = userRepository.save(user);
+
+        userRepository.delete(savedUser);
+
+        assertThat(userRepository.existsById(savedUser.getId())).isFalse();
+    }
+
     private static User getDefaultUser(String userName, String email, String firstName) {
         LocalDateTime now = LocalDateTime.now();
         return User.builder()
