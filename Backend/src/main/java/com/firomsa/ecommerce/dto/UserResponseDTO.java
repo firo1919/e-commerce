@@ -1,12 +1,11 @@
 package com.firomsa.ecommerce.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class UserResponseDTO {
     private String id;
     private String userName;
@@ -14,5 +13,5 @@ public class UserResponseDTO {
     private String firstName;
     private String lastName;
     private String role;
-    private String isActive;
+    private String active;
 }

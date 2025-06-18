@@ -21,8 +21,8 @@ class UserMapperTest {
             .firstName("Firomsa")
             .lastName("Assefa")
             .password("123")
-            .role(Role.CUSTOMER)
-            .isActive(true)
+            .role(Role.builder().name("USER").id(1).build())
+            .active(true)
             .build();
 
         UserResponseDTO userResponseDTO = UserMapper.toDTO(user);

@@ -4,19 +4,18 @@ import java.time.LocalDateTime;
 
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
-import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 
 public class UserMapper {
     public static UserResponseDTO toDTO(User user){
         return UserResponseDTO.builder()
+            .id(user.getId().toString())
             .email(user.getEmail())
             .firstName(user.getFirstName())
-            .id(user.getId().toString())
             .lastName(user.getLastName())
             .userName(user.getUserName())
-            .role(user.getRole().toString())
-            .isActive(Boolean.toString(user.isActive()))
+            .role(user.getRole().getName())
+            .active(Boolean.toString(user.isActive()))
             .build();
     }
 

@@ -1,5 +1,7 @@
 package com.firomsa.ecommerce.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +12,11 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class UserRepositoryTests {
@@ -23,21 +25,21 @@ public class UserRepositoryTests {
     private UserRepository userRepository;
 
     @Test
-    public void UserRepository_Save_ReturnSavedUser(){
+    public void UserRepository_Save_ReturnSavedUser() {
 
-        //Arrange
+        // Arrange
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
 
-        //Act
+        // Act
         User savedUser = userRepository.save(user);
 
-        //Assert
+        // Assert
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getId()).isNotNull();
     }
 
     @Test
-    public void UserRepository_FindAll_ReturnMoreThanOneUser(){
+    public void UserRepository_FindAll_ReturnMoreThanOneUser() {
 
         User user1 = getDefaultUser("firo", "example@gmail.com", "Firomsa");
         User user2 = getDefaultUser("kira", "example2@gmail.com", "Kirubel");
@@ -52,7 +54,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_ExistsByEmail_ReturnTrue(){
+    public void UserRepository_ExistsByEmail_ReturnTrue() {
 
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
 
@@ -64,7 +66,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_ExistsByEmailIdNot_ReturnTrue(){
+    public void UserRepository_ExistsByEmailIdNot_ReturnTrue() {
 
         User user1 = getDefaultUser("firo", "example@gmail.com", "Firomsa");
         User user2 = getDefaultUser("kira", "example2@gmail.com", "Kirubel");
@@ -78,7 +80,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_ExistsByUserName_ReturnTrue(){
+    public void UserRepository_ExistsByUserName_ReturnTrue() {
 
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
 
@@ -90,7 +92,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_FindById_ReturnUser(){
+    public void UserRepository_FindById_ReturnUser() {
 
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
 
@@ -103,7 +105,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_DeleteById_ReturnDeletedUser(){
+    public void UserRepository_DeleteById_ReturnDeletedUser() {
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
         User savedUser = userRepository.save(user);
 
@@ -113,7 +115,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void UserRepository_Delete_DeleteUser(){
+    public void UserRepository_Delete_DeleteUser() {
         User user = getDefaultUser("firo", "example@gmail.com", "Firomsa");
         User savedUser = userRepository.save(user);
 
@@ -130,8 +132,7 @@ public class UserRepositoryTests {
                 .firstName(firstName)
                 .lastName("Assefa")
                 .password("123")
-                .role(Role.CUSTOMER)
-                .isActive(true)
+                .active(true)
                 .createdAt(now)
                 .updatedAt(now)
                 .build();

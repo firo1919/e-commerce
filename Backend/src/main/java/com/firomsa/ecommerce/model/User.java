@@ -1,12 +1,10 @@
 package com.firomsa.ecommerce.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,11 +12,9 @@ import lombok.*;
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
-@ToString
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 public class User {
 
     @Id
@@ -42,15 +38,28 @@ public class User {
     private String password;
 
     @NotNull
+    @Builder.Default
+    private boolean active = Boolean.TRUE;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
-    @NotNull
-    private boolean isActive = Boolean.TRUE;
+    @OneToMany(mappedBy = "user")
+    private List<Address> addresses;
+
+    @OneToMany(mappedBy = "user")
+    private List<Review> reviews;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user")
+    private List<Cart> carts;
 
     @NotNull
     private LocalDateTime createdAt;
 
     @NotNull
     private LocalDateTime updatedAt;
-
 }

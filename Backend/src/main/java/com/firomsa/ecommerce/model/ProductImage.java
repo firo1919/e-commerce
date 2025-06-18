@@ -1,7 +1,5 @@
 package com.firomsa.ecommerce.model;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,21 +8,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "product_images")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class Role {
+public class ProductImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @NotNull
-    @Column(unique = true)
-    private String name;
+    private String url;
 
-    @OneToMany(mappedBy = "role")
-    private List<User> users;
+    @ManyToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    private Product product;
 }

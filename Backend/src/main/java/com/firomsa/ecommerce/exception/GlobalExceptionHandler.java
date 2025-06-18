@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException exception){
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(ResourceNotFoundException exception){
         Map<String, String> error = new HashMap<>();
         log.warn("User with this id doesnt exist: {}", exception.getMessage());
         error.put("message", "User with this id doesnt exist");

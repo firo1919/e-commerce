@@ -49,31 +49,31 @@ class UserControllerTest {
         User user1 = UserMapper.toModel(getUserRequestDTO("firo", "example@gmail.com", "Firomsa"));
         User user2 = UserMapper.toModel(getUserRequestDTO("kira", "example2@gmail.com", "Kirubel"));
         user1.setId(UUID.randomUUID());
-        user1.setRole(Role.CUSTOMER);
+        user1.setRole(Role.builder().name("USER").id(1).build());
         user2.setId(UUID.randomUUID());
-        user2.setRole(Role.CUSTOMER);
+        user2.setRole(Role.builder().name("USER").id(1).build());
         List<UserResponseDTO> responseDTO = List.of(UserMapper.toDTO(user2), UserMapper.toDTO(user1));
 
-        given(userService.getUsers()).willReturn(responseDTO);
+        given(userService.getAll()).willReturn(responseDTO);
 
         ResultActions response = this.mockMvc.perform(get("/api/users")
                 .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
-                .andExpect(jsonPath("$[0].userName", CoreMatchers.is(responseDTO.get(0).getUserName())))
-                .andExpect(jsonPath("$[0].email", CoreMatchers.is(responseDTO.get(0).getEmail())))
-                .andExpect(jsonPath("$[0].firstName", CoreMatchers.is(responseDTO.get(0).getFirstName())));
+                .andExpect(jsonPath("$[0].userName", CoreMatchers.is(responseDTO.getFirst().getUserName())))
+                .andExpect(jsonPath("$[0].email", CoreMatchers.is(responseDTO.getFirst().getEmail())))
+                .andExpect(jsonPath("$[0].firstName", CoreMatchers.is(responseDTO.getFirst().getFirstName())));
     }
 
     @Test
     public void UserController_GetUser_ReturnUser() throws Exception {
         User user = UserMapper.toModel(getUserRequestDTO("kira", "example2@gmail.com", "Kirubel"));
         user.setId(UUID.randomUUID());
-        user.setRole(Role.CUSTOMER);
+        user.setRole(Role.builder().name("USER").id(1).build());
         UserResponseDTO responseDTO = UserMapper.toDTO(user);
 
-        given(userService.getUser(user.getId())).willReturn(responseDTO);
+        given(userService.get(user.getId())).willReturn(responseDTO);
 
         ResultActions response = this.mockMvc.perform(get("/api/users/{id}", user.getId())
                 .contentType(MediaType.APPLICATION_JSON));
@@ -90,10 +90,10 @@ class UserControllerTest {
         UserRequestDTO userRequestDTO = getUserRequestDTO("kira", "example2@gmail.com", "Kirubel");
         User user = UserMapper.toModel(userRequestDTO);
         user.setId(UUID.randomUUID());
-        user.setRole(Role.CUSTOMER);
+        user.setRole(Role.builder().name("USER").id(1).build());
         UserResponseDTO responseDTO = UserMapper.toDTO(user);
 
-        given(userService.createUser(Mockito.any(UserRequestDTO.class))).willReturn(responseDTO);
+        given(userService.create(Mockito.any(UserRequestDTO.class))).willReturn(responseDTO);
 
         ResultActions response = this.mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,10 +111,10 @@ class UserControllerTest {
         UserRequestDTO userRequestDTO = getUserRequestDTO("kira", "example2@gmail.com", "Kirubel");
         User user = UserMapper.toModel(userRequestDTO);
         user.setId(UUID.randomUUID());
-        user.setRole(Role.CUSTOMER);
+        user.setRole(Role.builder().name("USER").id(1).build());
         UserResponseDTO responseDTO = UserMapper.toDTO(user);
 
-        given(userService.updateUser(Mockito.any(UserRequestDTO.class), Mockito.any(UUID.class)))
+        given(userService.update(Mockito.any(UserRequestDTO.class), Mockito.any(UUID.class)))
                 .willReturn(responseDTO);
 
         ResultActions response = this.mockMvc.perform(put("/api/users/{id}", user.getId())
@@ -131,7 +131,7 @@ class UserControllerTest {
     @Test
     public void UserController_DeleteUser_ReturnNothing() throws Exception {
         UUID id = UUID.randomUUID();
-        doNothing().when(userService).removeUser(Mockito.any(UUID.class));
+        doNothing().when(userService).remove(Mockito.any(UUID.class));
 
         ResultActions response = this.mockMvc.perform(delete("/api/users/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON));
