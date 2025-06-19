@@ -43,12 +43,30 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(ResourceNotFoundException exception){
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception){
         Map<String, String> error = new HashMap<>();
-        log.warn("User with this id doesnt exist: {}", exception.getMessage());
-        error.put("message", "User with this id doesnt exist");
+        log.warn("resource with this id doesnt exist: {} ", exception.getMessage());
+        error.put("message", "resource with this id doesnt exist " + exception.getMessage());
         
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<Map<String, String>> handleStorageException(StorageException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage(), exception.getCause().getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<Map<String, String>> handleException(Exception exception) {
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message", "something happened in the server");
+        
+        return ResponseEntity.internalServerError().body(error);
     }
 
 }
