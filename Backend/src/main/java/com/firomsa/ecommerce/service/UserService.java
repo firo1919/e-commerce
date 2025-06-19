@@ -2,13 +2,17 @@ package com.firomsa.ecommerce.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.firomsa.ecommerce.dto.AddressRequestDTO;
 import com.firomsa.ecommerce.dto.AddressResponseDTO;
+import com.firomsa.ecommerce.dto.CartRequestDTO;
 import com.firomsa.ecommerce.dto.CartResponseDTO;
 import com.firomsa.ecommerce.dto.OrderResponseDTO;
+import com.firomsa.ecommerce.dto.ReviewRequestDTO;
 import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
@@ -20,40 +24,56 @@ import com.firomsa.ecommerce.mapper.CartMapper;
 import com.firomsa.ecommerce.mapper.OrderMapper;
 import com.firomsa.ecommerce.mapper.ReviewMapper;
 import com.firomsa.ecommerce.mapper.UserMapper;
+import com.firomsa.ecommerce.model.Address;
+import com.firomsa.ecommerce.model.Cart;
+import com.firomsa.ecommerce.model.Product;
+import com.firomsa.ecommerce.model.Review;
 import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
-import com.firomsa.ecommerce.repository.RoleRepository;
-import com.firomsa.ecommerce.repository.UserRepository;
+import com.firomsa.ecommerce.repository.*;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
 
+    private final ReviewRepository reviewRepository;
+    private final AddressRepository addressRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    
-    public UserService(UserRepository userRepository, RoleRepository roleRepository) {
+    private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
+
+    public UserService(UserRepository userRepository, RoleRepository roleRepository,
+            ProductRepository productRepository, CartRepository cartRepository, AddressRepository addressRepository,
+            ReviewRepository reviewRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.productRepository = productRepository;
+        this.cartRepository = cartRepository;
+        this.addressRepository = addressRepository;
+        this.reviewRepository = reviewRepository;
     }
 
-    public List<UserResponseDTO> getAll(){
+    public List<UserResponseDTO> getAll() {
         return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
     }
 
     public UserResponseDTO get(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return UserMapper.toDTO(user);
     }
 
-    public UserResponseDTO create(UserRequestDTO userRequestDTO){
-        if(userRepository.existsByEmail(userRequestDTO.getEmail())){
+    public UserResponseDTO create(UserRequestDTO userRequestDTO) {
+        if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if(userRepository.existsByUserName(userRequestDTO.getUserName())){
+        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
             throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
         }
-        Role role = roleRepository.findByName("USER").orElseThrow(() -> new ResourceNotFoundException("Role User not found"));
+        Role role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new ResourceNotFoundException("Role: USER"));
         User model = UserMapper.toModel(userRequestDTO);
         model.setRole(role);
         model.setActive(true);
@@ -61,15 +81,16 @@ public class UserService {
         return UserMapper.toDTO(user);
     }
 
-    public UserResponseDTO createAdmin(UserRequestDTO userRequestDTO){
-        if(userRepository.existsByEmail(userRequestDTO.getEmail())){
+    public UserResponseDTO createAdmin(UserRequestDTO userRequestDTO) {
+        if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if(userRepository.existsByUserName(userRequestDTO.getUserName())){
+        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
             throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
         }
-        Role role = roleRepository.findByName("ADMIN").orElseThrow(() -> new ResourceNotFoundException("Role Admin not found"));
+        Role role = roleRepository.findByName("ADMIN")
+                .orElseThrow(() -> new ResourceNotFoundException("Role: ADMIN"));
         User model = UserMapper.toModel(userRequestDTO);
         model.setRole(role);
         model.setActive(true);
@@ -77,14 +98,14 @@ public class UserService {
         return UserMapper.toDTO(user);
     }
 
-    public UserResponseDTO update(UserRequestDTO userRequestDTO, UUID id){
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+    public UserResponseDTO update(UserRequestDTO userRequestDTO, UUID id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
 
-        if(userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)){
+        if (userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)) {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if(userRepository.existsByUserName(userRequestDTO.getUserName())){
+        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
             throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
         }
 
@@ -95,37 +116,93 @@ public class UserService {
         user.setPassword(userRequestDTO.getPassword());
         user.setUpdatedAt(LocalDateTime.now());
 
-        return  UserMapper.toDTO(userRepository.save(user));
+        return UserMapper.toDTO(userRepository.save(user));
     }
 
-    public void remove(UUID id){
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+    public void remove(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         userRepository.delete(user);
     }
 
-    public void softDelete(UUID id){
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+    public void softDelete(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         user.setActive(false);
         userRepository.save(user);
     }
 
     public List<CartResponseDTO> getCarts(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getCarts().stream().map(CartMapper::toDTO).toList();
     }
 
+    public CartResponseDTO addItemToCart(UUID id, CartRequestDTO cartRequestDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        Product product = productRepository.findById(cartRequestDTO.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + cartRequestDTO.getProductId()));
+
+        LocalDateTime now = LocalDateTime.now();
+        Cart cart;
+        Optional<Cart> existingCart = cartRepository.findByUserAndProduct(user, product);
+        if (existingCart.isPresent()) {
+            cart = existingCart.get();
+            int quantity = cart.getQuantity();
+            cart.setQuantity(quantity + cartRequestDTO.getQuantity());
+            cart.setUpdatedAt(now);
+        } else {
+            cart = CartMapper.toModel(cartRequestDTO);
+            cart.setCreatedAt(now);
+            cart.setUpdatedAt(now);
+            cart.setProduct(product);
+            cart.setUser(user);
+        }
+
+        return CartMapper.toDTO(cartRepository.save(cart));
+    }
+
     public List<OrderResponseDTO> getOrders(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getOrders().stream().map(OrderMapper::toDTO).toList();
     }
 
     public List<AddressResponseDTO> getAddresses(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getAddresses().stream().map(AddressMapper::toDTO).toList();
     }
 
+    @Transactional
+    public AddressResponseDTO addAddressToAddresses(UUID id, AddressRequestDTO addressRequestDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        Address address = AddressMapper.toModel(addressRequestDTO);
+        if (address.getActive()) {
+            Optional<Address> defaultAddress = addressRepository.findByUserAndActive(user, true);
+            if (defaultAddress.isPresent()) {
+                Address defAddress = defaultAddress.get();
+                defAddress.setActive(false);
+                addressRepository.save(defAddress);
+            }
+        }
+        address.setUser(user);
+        return AddressMapper.toDTO(addressRepository.save(address));
+    }
+
     public List<ReviewResponseDTO> getReviews(UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getReviews().stream().map(ReviewMapper::toDTO).toList();
+    }
+
+    public ReviewResponseDTO addReviewToReviews(UUID id, ReviewRequestDTO reviewRequestDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        Review review = ReviewMapper.toModel(reviewRequestDTO);
+        review.setUser(user);
+        return ReviewMapper.toDTO(reviewRepository.save(review));
     }
 }

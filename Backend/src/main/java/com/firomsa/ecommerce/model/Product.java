@@ -26,7 +26,10 @@ public class Product {
     @NotNull
     private String description;
     
+    @NotNull
     private Double price;
+
+    @NotNull
     private int stock;
 
     @ManyToMany
@@ -38,7 +41,7 @@ public class Product {
     private List<Category> categories;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductImage> productImages;
+    private List<Image> productImages;
 
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
@@ -50,7 +53,8 @@ public class Product {
     private List<Cart> carts;
 
     @NotNull
-    private String active;
+    @Builder.Default
+    private boolean active = Boolean.TRUE;
 
     @NotNull
     private LocalDateTime createdAt;

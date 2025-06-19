@@ -68,7 +68,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getFirstName()).isEqualTo(user.getFirstName());
         assertThat(responseDTO.getLastName()).isEqualTo(user.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(user.getRole().getName());
-        assertThat(responseDTO.getActive()).isEqualTo(Boolean.toString(user.isActive()));
+        assertThat(responseDTO.isActive()).isEqualTo(Boolean.toString(user.isActive()));
         assertThat(responseDTO.getUserName()).isEqualTo(user.getUserName());
     }
 
@@ -95,7 +95,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
         assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
-        assertThat(responseDTO.getActive()).isEqualTo(userResponseDTO.getActive());
+        assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
         assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
-        assertThat(responseDTO.getActive()).isEqualTo(userResponseDTO.getActive());
+        assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
     @Test
@@ -147,7 +147,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
         assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
-        assertThat(responseDTO.getActive()).isEqualTo(userResponseDTO.getActive());
+        assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
     @Test
