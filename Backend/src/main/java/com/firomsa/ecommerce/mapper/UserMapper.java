@@ -15,7 +15,7 @@ public class UserMapper {
             .lastName(user.getLastName())
             .userName(user.getUserName())
             .role(user.getRole().getName())
-            .active(Boolean.toString(user.isActive()))
+            .active(user.isActive())
             .build();
     }
 

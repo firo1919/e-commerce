@@ -6,11 +6,11 @@ import com.firomsa.ecommerce.model.OrderItem;
 public class OrderItemMapper {
     public static OrderItemResponseDTO toDTO(OrderItem orderItem){
         return OrderItemResponseDTO.builder()
-                .id(orderItem.getId().toString())
-                .orderId(orderItem.getOrder().getId().toString())
+                .id(orderItem.getId())
+                .orderId(orderItem.getOrder().getId())
                 .productId(orderItem.getProduct().getId().toString())
-                .priceAtPurchase(orderItem.getPriceAtPurchase().toString())
-                .quantity(String.valueOf(orderItem.getQuantity()))
+                .priceAtPurchase(orderItem.getPriceAtPurchase())
+                .quantity(orderItem.getQuantity())
                 .build();
     }
 }

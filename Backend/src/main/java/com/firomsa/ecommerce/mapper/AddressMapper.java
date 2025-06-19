@@ -7,7 +7,7 @@ import com.firomsa.ecommerce.model.Address;
 public class AddressMapper {
     public static AddressResponseDTO toDTO(Address address){
         return AddressResponseDTO.builder()
-                .id(address.getId().toString())
+                .id(address.getId())
                 .userId(address.getUser().getId().toString())
                 .firstName(address.getFirstName())
                 .lastName(address.getLastName())
@@ -17,7 +17,7 @@ public class AddressMapper {
                 .zipCode(address.getZipCode())
                 .country(address.getCountry())
                 .phone(address.getPhone())
-                .active(address. getActive())
+                .active(address.getActive())
                 .build();
     }
 
@@ -31,7 +31,7 @@ public class AddressMapper {
                 .zipCode(addressRequestDTO.getZipCode())
                 .country(addressRequestDTO.getCountry())
                 .phone(addressRequestDTO.getPhone())
-                .active(addressRequestDTO. getActive())
+                .active(addressRequestDTO.isActive())
                 .build();
     }
 }

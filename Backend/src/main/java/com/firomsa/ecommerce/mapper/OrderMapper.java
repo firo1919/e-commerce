@@ -9,11 +9,11 @@ public class OrderMapper {
     public static OrderResponseDTO toDTO(Order order){
         return OrderResponseDTO.builder()
                 .status(order.getStatus().toString())
-                .totalPrice(order.getTotalPrice().toString())
+                .totalPrice(order.getTotalPrice())
                 .createdAt(order.getCreatedAt().toString())
                 .orderItems(order.getOrderItems().stream().map(OrderItemMapper::toDTO).toList())
                 .updatedAt(order.getUpdatedAt().toString())
-                .id(order.getId().toString())
+                .id(order.getId())
                 .userId(order.getUser().getId().toString())
                 .build();
     }
