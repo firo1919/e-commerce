@@ -12,11 +12,11 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class OrderResponseDTO {
-    private String id;
+    private Long id;
     private String userId;
     private List<OrderItemResponseDTO> orderItems;
     private String status;
-    private String totalPrice;
+    private Double totalPrice;
     private String createdAt;
     private String updatedAt;
 }

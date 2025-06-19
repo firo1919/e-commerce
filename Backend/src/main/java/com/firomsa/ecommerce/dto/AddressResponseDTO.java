@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class AddressResponseDTO {
-    private String id;
+    private Long id;
     private String userId;
     private String firstName;
     private String lastName;
@@ -20,5 +20,5 @@ public class AddressResponseDTO {
     private String zipCode;
     private String country;
     private String phone;
-    private Boolean active;
+    private boolean active;
 }

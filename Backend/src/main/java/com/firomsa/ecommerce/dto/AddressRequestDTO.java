@@ -32,5 +32,5 @@ public class AddressRequestDTO {
     private String country;
     @NotBlank(message = "phone is required")
     private String phone;
-    private Boolean active;
+    private boolean active;
 }

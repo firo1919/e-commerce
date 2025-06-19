@@ -9,12 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ReviewResponseDTO {
+public class CategoryResponseDTO {
     private Long id;
-    private String userId;
-    private String productId;
-    private int rating;
-    private String comment;
-    private String createdAt;
-    private String updatedAt;
+    private String name;
 }

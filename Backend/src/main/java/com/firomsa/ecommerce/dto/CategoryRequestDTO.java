@@ -1,5 +1,6 @@
 package com.firomsa.ecommerce.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class CartResponseDTO {
-    private Long id;
-    private String userId;
-    private String productId;
-    private int quantity;
-    private String createdAt;
-    private String updatedAt;
+public class CategoryRequestDTO {
+    @NotBlank(message = "Category name is required")
+    private String name;
 }

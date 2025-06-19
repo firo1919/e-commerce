@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class CartResponseDTO {
-    private Long id;
-    private String userId;
-    private String productId;
-    private int quantity;
-    private String createdAt;
-    private String updatedAt;
+public class ImageDTO {
+    private String name;
+    private String url;
 }
