@@ -1,4 +1,4 @@
-name: ecommerce-backend
+name: ecommerce
 services:
     app:
         build:
@@ -13,7 +13,9 @@ services:
             - SPRINGDOC_APIDOCS_ENABLED
         image: firo1919/ecommerce-backend:dev
         networks:
-            - dev-net
+            - app
+        volumes:
+            - app_storage:/store
         ports:
             - "8080:8080"
         depends_on:
@@ -29,9 +31,9 @@ services:
         image: "mariadb:latest"
         restart: unless-stopped
         volumes:
-            - db_dev_data:/var/lib/mysql
+            - db_data:/var/lib/mysql
         networks:
-            - dev-net
+            - app
         healthcheck:
             test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
             interval: 10s
@@ -42,7 +44,8 @@ services:
             - "3306:3306"
 
 volumes:
-    db_dev_data:
+    db_data:
+    app_storage:
 
 networks:
-    dev-net:
+    app:
