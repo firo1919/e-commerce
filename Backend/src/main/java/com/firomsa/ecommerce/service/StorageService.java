@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.firomsa.ecommerce.dto.ImageDTO;
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.exception.StorageException;
+import com.firomsa.ecommerce.mapper.ImageMapper;
 import com.firomsa.ecommerce.model.Image;
 import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.repository.ImageRepository;
@@ -43,15 +44,15 @@ public class StorageService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
         List<Image> images = product.getProductImages();
-        List<ImageDTO> imageDTOs = images.stream().map(image -> ImageDTO.builder()
-                .name(image.getName())
-                .url("/api/images/" + image.getName())
-                .build()).toList();
+        List<ImageDTO> imageDTOs = images.stream().map(ImageMapper::toDTO).toList();
 
         return imageDTOs;
     }
 
     public Resource getImage(String imageName) {
+        if(!imageRepository.existsByName(imageName)){
+            throw new ResourceNotFoundException("Image: "+imageName);
+        }
         try {
             Path file = this.rootLocation.resolve(imageName);
             Resource resource = new UrlResource(file.toUri());
@@ -81,7 +82,7 @@ public class StorageService {
                             .split("\\.")[0])
                     .reverse().toString();
 
-            String fileName = "productimage::" + LocalDateTime.now().toString() + "." + filetype;
+            String fileName = "image-" + LocalDateTime.now().toString() + "." + filetype;
             Path destinationFile = this.rootLocation.resolve(
                     Paths.get(fileName))
                     .normalize().toAbsolutePath();
@@ -101,10 +102,7 @@ public class StorageService {
             log.info("adding image entity to database");
 
             Image savedImage = imageRepository.save(image);
-            ImageDTO imageDTO = ImageDTO.builder()
-                    .name(savedImage.getName())
-                    .url("/api/images/" + savedImage.getName())
-                    .build();
+            ImageDTO imageDTO = ImageMapper.toDTO(savedImage);
 
             return imageDTO;
 

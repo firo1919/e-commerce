@@ -14,6 +14,7 @@ public class ProductMapper {
                 .stock(product.getStock())
                 .categories(product.getCategories().stream().map(CategoryMapper::toDTO).toList())
                 .active(product.isActive())
+                .productImages(product.getProductImages().stream().map(ImageMapper::toDTO).toList())
                 .build();
     }
 
