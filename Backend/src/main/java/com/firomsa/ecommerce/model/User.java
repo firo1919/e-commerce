@@ -1,6 +1,7 @@
 package com.firomsa.ecommerce.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,16 +47,20 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
-    private List<Address> addresses;
+    @Builder.Default
+    private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Review> reviews;
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+    @Builder.Default
+    private List<Order> orders = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Cart> carts;
+    @Builder.Default
+    private List<Cart> carts = new ArrayList<>();
 
     @NotNull
     private LocalDateTime createdAt;

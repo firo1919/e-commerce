@@ -1,5 +1,6 @@
 package com.firomsa.ecommerce.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -26,5 +27,6 @@ public class Role {
     private String name;
 
     @OneToMany(mappedBy = "role")
-    private List<User> users;
+    @Builder.Default
+    private List<User> users = new ArrayList<>();
 }

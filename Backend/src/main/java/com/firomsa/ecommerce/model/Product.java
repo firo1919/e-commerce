@@ -1,6 +1,7 @@
 package com.firomsa.ecommerce.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,19 +39,24 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
     )
-    private List<Category> categories;
+    @Builder.Default
+    private List<Category> categories = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<Image> productImages;
+    @Builder.Default
+    private List<Image> productImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<Review> reviews;
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;
+    @Builder.Default
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<Cart> carts;
+    @Builder.Default
+    private List<Cart> carts = new ArrayList<>();
 
     @NotNull
     @Builder.Default
