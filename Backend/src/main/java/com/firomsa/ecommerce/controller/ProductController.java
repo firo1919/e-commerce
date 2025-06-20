@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.firomsa.ecommerce.dto.ImageDTO;
 import com.firomsa.ecommerce.dto.ProductRequestDTO;
 import com.firomsa.ecommerce.dto.ProductResponseDTO;
+import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.service.ProductService;
 import com.firomsa.ecommerce.service.StorageService;
 
@@ -97,4 +98,11 @@ public class ProductController {
         ImageDTO image = storageService.addProductImage(file, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(image);
 	}
+
+    @Operation(summary = "For getting all product reviews")
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewResponseDTO>> getUserReviews(@PathVariable UUID id) {
+        List<ReviewResponseDTO> reviews = productService.getReviews(id);
+        return ResponseEntity.ok().body(reviews);
+    }
 }

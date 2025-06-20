@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +42,12 @@ public class ImageController {
     public ResponseEntity<Resource> getImage(@PathVariable String id) {
         Resource resource = storageService.getImage(id);
         return ResponseEntity.ok().body(resource);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    @Operation(summary = "For deleting an image")
+    public ResponseEntity<Void> deleteImage(@PathVariable String id) {
+        imageService.remove(id);
+        return ResponseEntity.noContent().build();
     }
 }

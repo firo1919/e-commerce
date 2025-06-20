@@ -32,8 +32,10 @@ import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.*;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class UserService {
 
     private final ReviewRepository reviewRepository;
@@ -198,11 +200,17 @@ public class UserService {
         return user.getReviews().stream().map(ReviewMapper::toDTO).toList();
     }
 
-    public ReviewResponseDTO addReviewToReviews(UUID id, ReviewRequestDTO reviewRequestDTO) {
+    @Transactional
+    public ReviewResponseDTO addReviewToReviews(UUID id, ReviewRequestDTO reviewRequestDTO, UUID productId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product: " + productId.toString()));
         Review review = ReviewMapper.toModel(reviewRequestDTO);
+        LocalDateTime now = LocalDateTime.now();
         review.setUser(user);
+        review.setProduct(product);
+        review.setCreatedAt(now);
+        review.setUpdatedAt(now);
         return ReviewMapper.toDTO(reviewRepository.save(review));
     }
 }

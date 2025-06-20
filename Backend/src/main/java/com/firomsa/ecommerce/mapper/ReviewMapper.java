@@ -13,7 +13,6 @@ public class ReviewMapper {
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt().toString())
-                .updatedAt(review.getUpdatedAt().toString())
                 .build();
     }
 

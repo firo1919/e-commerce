@@ -135,9 +135,9 @@ public class UserController {
 
     @Operation(summary = "For adding a review to users reviews")
     @PostMapping("/{id}/reviews")
-    public ResponseEntity<ReviewResponseDTO> addAddressToUserAddresses(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
-            @PathVariable UUID id) {
-        ReviewResponseDTO review = userService.addReviewToReviews(id, reviewRequestDTO);
+    public ResponseEntity<ReviewResponseDTO> addReviewToUserReviews(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
+            @PathVariable UUID id, @RequestParam UUID productId) {
+        ReviewResponseDTO review = userService.addReviewToReviews(id, reviewRequestDTO, productId);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/reviews/{id}")
                 .buildAndExpand(review.getId()).toUri();
         return ResponseEntity.created(location).body(review);

@@ -31,7 +31,10 @@ public class Review {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
+    @NotNull
     private int rating;
+
+    @NotNull
     private String comment;
 
     @NotNull

@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.firomsa.ecommerce.dto.CategoryRequestDTO;
 import com.firomsa.ecommerce.dto.ProductRequestDTO;
 import com.firomsa.ecommerce.dto.ProductResponseDTO;
+import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.mapper.ProductMapper;
+import com.firomsa.ecommerce.mapper.ReviewMapper;
 import com.firomsa.ecommerce.model.Category;
 import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.repository.CategoryRepository;
@@ -97,6 +99,12 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
         product.setActive(false);
         productRepository.save(product);
+    }
+
+    public List<ReviewResponseDTO> getReviews(UUID id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        return product.getReviews().stream().map(ReviewMapper::toDTO).toList();
     }
 
 }

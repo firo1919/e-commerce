@@ -16,5 +16,4 @@ public class ReviewResponseDTO {
     private int rating;
     private String comment;
     private String createdAt;
-    private String updatedAt;
 }
