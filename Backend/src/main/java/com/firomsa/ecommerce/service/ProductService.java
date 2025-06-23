@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.firomsa.ecommerce.dto.CategoryRequestDTO;
 import com.firomsa.ecommerce.dto.ProductRequestDTO;
@@ -20,7 +21,6 @@ import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.repository.CategoryRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 
-import jakarta.transaction.Transactional;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;

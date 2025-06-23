@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.firomsa.ecommerce.dto.AddressRequestDTO;
 import com.firomsa.ecommerce.dto.AddressResponseDTO;
@@ -31,8 +32,13 @@ import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.model.Review;
 import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
-import com.firomsa.ecommerce.repository.*;
-import jakarta.transaction.Transactional;
+import com.firomsa.ecommerce.repository.AddressRepository;
+import com.firomsa.ecommerce.repository.CartRepository;
+import com.firomsa.ecommerce.repository.ProductRepository;
+import com.firomsa.ecommerce.repository.ReviewRepository;
+import com.firomsa.ecommerce.repository.RoleRepository;
+import com.firomsa.ecommerce.repository.UserRepository;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
