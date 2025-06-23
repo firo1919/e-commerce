@@ -95,8 +95,8 @@ public class UserController {
     @Operation(summary = "For adding a cartItem to users cart")
     @PostMapping("/{id}/carts")
     public ResponseEntity<CartResponseDTO> addItemToUserCart(@Valid @RequestBody CartRequestDTO cartRequestDTO,
-            @PathVariable UUID id) {
-        CartResponseDTO cart = userService.addItemToCart(id, cartRequestDTO);
+            @PathVariable UUID id, @RequestParam UUID productId) {
+        CartResponseDTO cart = userService.addItemToCart(id, cartRequestDTO, productId);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/carts/{id}")
                 .buildAndExpand(cart.getId()).toUri();
         return ResponseEntity.created(location).body(cart);

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +60,24 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity.badRequest().body(error);
     }
+
+    @ExceptionHandler(LimitedProductStockException.class)
+    public ResponseEntity<Map<String, String>> handleLimitedProductStockException(LimitedProductStockException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+    
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Map<String, String>> handleException(Exception exception) {

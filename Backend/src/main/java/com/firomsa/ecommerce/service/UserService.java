@@ -17,6 +17,7 @@ import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
 import com.firomsa.ecommerce.exception.EmailAlreadyExistsException;
+import com.firomsa.ecommerce.exception.LimitedProductStockException;
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.exception.UserNameAlreadyExistsException;
 import com.firomsa.ecommerce.mapper.AddressMapper;
@@ -140,15 +141,18 @@ public class UserService {
         return user.getCarts().stream().map(CartMapper::toDTO).toList();
     }
 
-    public CartResponseDTO addItemToCart(UUID id, CartRequestDTO cartRequestDTO) {
+    public CartResponseDTO addItemToCart(UUID id, CartRequestDTO cartRequestDTO, UUID productId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
-        Product product = productRepository.findById(cartRequestDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product: " + cartRequestDTO.getProductId()));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + productId.toString()));
 
         LocalDateTime now = LocalDateTime.now();
         Cart cart;
         Optional<Cart> existingCart = cartRepository.findByUserAndProduct(user, product);
+        if(cartRequestDTO.getQuantity() > product.getStock()){
+            throw new LimitedProductStockException("Product Stock Limited");
+        }
         if (existingCart.isPresent()) {
             cart = existingCart.get();
             int quantity = cart.getQuantity();
@@ -190,7 +194,10 @@ public class UserService {
                 addressRepository.save(defAddress);
             }
         }
+        LocalDateTime now = LocalDateTime.now();
         address.setUser(user);
+        address.setCreatedAt(now);
+        address.setUpdatedAt(now);
         return AddressMapper.toDTO(addressRepository.save(address));
     }
 

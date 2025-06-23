@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ImageController {
 
     private final StorageService storageService;
-    private ImageService imageService;
+    private final ImageService imageService;
 
     public ImageController(ImageService imageService, StorageService storageService){
         this.imageService = imageService;
