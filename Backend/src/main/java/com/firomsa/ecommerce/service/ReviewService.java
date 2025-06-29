@@ -12,7 +12,7 @@ import com.firomsa.ecommerce.repository.ReviewRepository;
 
 @Service
 public class ReviewService {
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
 
     public ReviewService(ReviewRepository reviewRepository){
         this.reviewRepository = reviewRepository;

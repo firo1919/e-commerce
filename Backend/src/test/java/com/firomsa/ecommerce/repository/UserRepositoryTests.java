@@ -86,7 +86,7 @@ public class UserRepositoryTests {
 
         userRepository.save(user);
 
-        boolean userExistsUserName = userRepository.existsByUserName("firo");
+        boolean userExistsUserName = userRepository.existsByUsername("firo");
 
         assertThat(userExistsUserName).isTrue();
     }
@@ -127,7 +127,7 @@ public class UserRepositoryTests {
     private static User getDefaultUser(String userName, String email, String firstName) {
         LocalDateTime now = LocalDateTime.now();
         return User.builder()
-                .userName(userName)
+                .username(userName)
                 .email(email)
                 .firstName(firstName)
                 .lastName("Assefa")

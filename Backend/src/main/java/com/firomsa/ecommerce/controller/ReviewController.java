@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Review", description = "API for managing reviews")
 public class ReviewController {
 
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
 
     public ReviewController(ReviewService reviewService){
         this.reviewService = reviewService;

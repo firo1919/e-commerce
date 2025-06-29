@@ -61,7 +61,7 @@ class UserControllerTest {
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
-                .andExpect(jsonPath("$[0].userName", CoreMatchers.is(responseDTO.getFirst().getUserName())))
+                .andExpect(jsonPath("$[0].userName", CoreMatchers.is(responseDTO.getFirst().getUsername())))
                 .andExpect(jsonPath("$[0].email", CoreMatchers.is(responseDTO.getFirst().getEmail())))
                 .andExpect(jsonPath("$[0].firstName", CoreMatchers.is(responseDTO.getFirst().getFirstName())));
     }
@@ -80,7 +80,7 @@ class UserControllerTest {
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUserName())))
+                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUsername())))
                 .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(responseDTO.getFirstName())));
     }
@@ -101,7 +101,7 @@ class UserControllerTest {
 
         response.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUserName())))
+                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUsername())))
                 .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(responseDTO.getFirstName())));
     }
@@ -123,7 +123,7 @@ class UserControllerTest {
 
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUserName())))
+                .andExpect(jsonPath("$.userName", CoreMatchers.is(responseDTO.getUsername())))
                 .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(responseDTO.getFirstName())));
     }
@@ -141,7 +141,7 @@ class UserControllerTest {
 
     private static UserRequestDTO getUserRequestDTO(String userName, String email, String firstName) {
         return UserRequestDTO.builder()
-                .userName(userName)
+                .username(userName)
                 .email(email)
                 .firstName(firstName)
                 .lastName("Assefa")

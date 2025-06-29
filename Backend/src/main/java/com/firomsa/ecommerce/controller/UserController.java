@@ -57,15 +57,6 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
-    @Operation(summary = "For adding a user")
-    @PostMapping()
-    public ResponseEntity<UserResponseDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
-        UserResponseDTO user = userService.create(userRequestDTO);
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/{id}")
-                .buildAndExpand(user.getId()).toUri();
-        return ResponseEntity.created(location).body(user);
-    }
-
     @Operation(summary = "For updating a user")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserRequestDTO userRequestDTO,

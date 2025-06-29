@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -71,6 +72,15 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException exception){
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
         error.put("message",exception.getMessage());

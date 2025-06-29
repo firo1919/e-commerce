@@ -11,6 +11,9 @@ services:
             - SPRING_DATASOURCE_USERNAME
             - SPRING_JPA_HIBERNATE_DDLAUTO
             - SPRINGDOC_APIDOCS_ENABLED
+            - SPRING_SQL_INIT_MODE
+            - SPRING_JPA_DEFERDATASOURCEINITIALIZATION
+            - SPRING_SQL_INIT_CONTINUEONERROR
         image: firo1919/ecommerce-backend:dev
         networks:
             - app

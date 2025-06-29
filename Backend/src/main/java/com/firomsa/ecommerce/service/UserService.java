@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +47,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService{
 
+    private final PasswordEncoder passwordEncoder;
     private final ReviewRepository reviewRepository;
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
@@ -52,15 +57,16 @@ public class UserService {
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository,
-            ProductRepository productRepository, CartRepository cartRepository, AddressRepository addressRepository,
-            ReviewRepository reviewRepository) {
+    public UserService(PasswordEncoder passwordEncoder, ReviewRepository reviewRepository,
+            AddressRepository addressRepository, UserRepository userRepository, RoleRepository roleRepository,
+            ProductRepository productRepository, CartRepository cartRepository) {
+        this.passwordEncoder = passwordEncoder;
+        this.reviewRepository = reviewRepository;
+        this.addressRepository = addressRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
-        this.addressRepository = addressRepository;
-        this.reviewRepository = reviewRepository;
     }
 
     public List<UserResponseDTO> getAll() {
@@ -78,16 +84,16 @@ public class UserService {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
-            throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
+        if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
+            throw new UserNameAlreadyExistsException(userRequestDTO.getUsername());
         }
         Role role = roleRepository.findByName("USER")
                 .orElseThrow(() -> new ResourceNotFoundException("Role: USER"));
-        User model = UserMapper.toModel(userRequestDTO);
-        model.setRole(role);
-        model.setActive(true);
-        User user = userRepository.save(model);
-        return UserMapper.toDTO(user);
+        User user = UserMapper.toModel(userRequestDTO);
+        user.setRole(role);
+        user.setActive(true);
+        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        return UserMapper.toDTO(userRepository.save(user));
     }
 
     public UserResponseDTO createAdmin(UserRequestDTO userRequestDTO) {
@@ -95,16 +101,16 @@ public class UserService {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
-            throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
+        if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
+            throw new UserNameAlreadyExistsException(userRequestDTO.getUsername());
         }
         Role role = roleRepository.findByName("ADMIN")
                 .orElseThrow(() -> new ResourceNotFoundException("Role: ADMIN"));
-        User model = UserMapper.toModel(userRequestDTO);
-        model.setRole(role);
-        model.setActive(true);
-        User user = userRepository.save(model);
-        return UserMapper.toDTO(user);
+        User admin = UserMapper.toModel(userRequestDTO);
+        admin.setRole(role);
+        admin.setActive(true);
+        admin.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        return UserMapper.toDTO(userRepository.save(admin));
     }
 
     public UserResponseDTO update(UserRequestDTO userRequestDTO, UUID id) {
@@ -114,13 +120,13 @@ public class UserService {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if (userRepository.existsByUserName(userRequestDTO.getUserName())) {
-            throw new UserNameAlreadyExistsException(userRequestDTO.getUserName());
+        if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
+            throw new UserNameAlreadyExistsException(userRequestDTO.getUsername());
         }
 
         user.setLastName(userRequestDTO.getLastName());
         user.setFirstName(userRequestDTO.getFirstName());
-        user.setUserName(userRequestDTO.getUserName());
+        user.setUsername(userRequestDTO.getUsername());
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(userRequestDTO.getPassword());
         user.setUpdatedAt(LocalDateTime.now());
@@ -225,5 +231,14 @@ public class UserService {
         review.setCreatedAt(now);
         review.setUpdatedAt(now);
         return ReviewMapper.toDTO(reviewRepository.save(review));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserDetails user = userRepository.findByUsername(username).orElseThrow(() ->
+            new UsernameNotFoundException("USER: "+username +"not found")
+        );
+
+        return user;
     }
 }

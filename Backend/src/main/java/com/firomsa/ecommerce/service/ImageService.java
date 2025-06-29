@@ -12,7 +12,7 @@ import com.firomsa.ecommerce.repository.ImageRepository;
 
 @Service
 public class ImageService {
-    private ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
     public ImageService(ImageRepository imageRepository){
         this.imageRepository = imageRepository;

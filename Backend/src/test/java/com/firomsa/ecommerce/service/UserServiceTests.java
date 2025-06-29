@@ -1,12 +1,13 @@
 package com.firomsa.ecommerce.service;
 
-import com.firomsa.ecommerce.dto.UserRequestDTO;
-import com.firomsa.ecommerce.dto.UserResponseDTO;
-import com.firomsa.ecommerce.mapper.UserMapper;
-import com.firomsa.ecommerce.model.Role;
-import com.firomsa.ecommerce.model.User;
-import com.firomsa.ecommerce.repository.RoleRepository;
-import com.firomsa.ecommerce.repository.UserRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,13 +15,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import com.firomsa.ecommerce.dto.UserRequestDTO;
+import com.firomsa.ecommerce.dto.UserResponseDTO;
+import com.firomsa.ecommerce.mapper.UserMapper;
+import com.firomsa.ecommerce.model.Role;
+import com.firomsa.ecommerce.model.User;
+import com.firomsa.ecommerce.repository.RoleRepository;
+import com.firomsa.ecommerce.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
@@ -69,7 +70,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getLastName()).isEqualTo(user.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(user.getRole().getName());
         assertThat(responseDTO.isActive()).isEqualTo(Boolean.toString(user.isActive()));
-        assertThat(responseDTO.getUserName()).isEqualTo(user.getUserName());
+        assertThat(responseDTO.getUsername()).isEqualTo(user.getUsername());
     }
 
     @Test
@@ -82,7 +83,7 @@ public class UserServiceTests {
 
         // Controlling the output of the Mock userRepository save method in the createUser method being tested
         given(userRepository.save(Mockito.any(User.class))).willReturn(user);
-        given(userRepository.existsByUserName(Mockito.anyString())).willReturn(false);
+        given(userRepository.existsByUsername(Mockito.anyString())).willReturn(false);
         given(userRepository.existsByEmail(Mockito.anyString())).willReturn(false);
         given(roleRepository.findByName("USER")).willReturn(Optional.of(role));
 
@@ -94,7 +95,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
-        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getUsername()).isEqualTo(userResponseDTO.getUsername());
         assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
@@ -108,7 +109,7 @@ public class UserServiceTests {
 
         // Controlling the output of the Mock userRepository save method in the createUser method being tested
         given(userRepository.save(Mockito.any(User.class))).willReturn(user);
-        given(userRepository.existsByUserName(Mockito.anyString())).willReturn(false);
+        given(userRepository.existsByUsername(Mockito.anyString())).willReturn(false);
         given(userRepository.existsByEmail(Mockito.anyString())).willReturn(false);
         given(roleRepository.findByName("ADMIN")).willReturn(Optional.of(Role.builder().name("ADMIN").id(2).build()));
 
@@ -121,7 +122,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
-        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getUsername()).isEqualTo(userResponseDTO.getUsername());
         assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
@@ -135,7 +136,7 @@ public class UserServiceTests {
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(userRepository.save(Mockito.any(User.class))).willReturn(user);
-        given(userRepository.existsByUserName(user.getUserName())).willReturn(false);
+        given(userRepository.existsByUsername(user.getUsername())).willReturn(false);
         given(userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())).willReturn(false);
 
         UserResponseDTO responseDTO = userService.update(userRequestDTO, user.getId());
@@ -146,7 +147,7 @@ public class UserServiceTests {
         assertThat(responseDTO.getFirstName()).isEqualTo(userResponseDTO.getFirstName());
         assertThat(responseDTO.getLastName()).isEqualTo(userResponseDTO.getLastName());
         assertThat(responseDTO.getRole()).isEqualTo(userResponseDTO.getRole());
-        assertThat(responseDTO.getUserName()).isEqualTo(userResponseDTO.getUserName());
+        assertThat(responseDTO.getUsername()).isEqualTo(userResponseDTO.getUsername());
         assertThat(responseDTO.isActive()).isEqualTo(userResponseDTO.isActive());
     }
 
@@ -154,7 +155,7 @@ public class UserServiceTests {
     public void UserService_RemoveUser_CallsDeleteById(){
         User user = User.builder()
                 .id(UUID.randomUUID())
-                .userName("firo")
+                .username("firo")
                 .email("example@gmail.com")
                 .firstName("Firomsa")
                 .lastName("Assefa")
@@ -173,7 +174,7 @@ public class UserServiceTests {
     public void UserService_SoftRemoveUser_CallsSave() {
         User user = User.builder()
                 .id(UUID.randomUUID())
-                .userName("firo")
+                .username("firo")
                 .email("example@gmail.com")
                 .firstName("Firomsa")
                 .lastName("Assefa")
@@ -188,7 +189,7 @@ public class UserServiceTests {
 
     private static UserRequestDTO getUserRequestDTO(String userName, String email, String firstName) {
         return UserRequestDTO.builder()
-                .userName(userName)
+                .username(userName)
                 .email(email)
                 .firstName(firstName)
                 .lastName("Assefa")
