@@ -5,6 +5,9 @@ import com.firomsa.ecommerce.dto.CartResponseDTO;
 import com.firomsa.ecommerce.model.Cart;
 
 public class CartMapper {
+
+    private CartMapper(){}
+    
     public static CartResponseDTO toDTO(Cart cart){
         return CartResponseDTO.builder()
                 .id(cart.getId())

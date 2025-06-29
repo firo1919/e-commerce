@@ -54,9 +54,9 @@ public class AddressService {
         address.setActive(addressRequestDTO.isActive());
         address.setUpdatedAt(LocalDateTime.now());
 
-        if (address.getActive()) {
+        if (Boolean.TRUE.equals(address.getActive())) {
             Optional<Address> defaultAddress = addressRepository.findByUserAndActive(address.getUser(), true);
-            if (defaultAddress.isPresent() && defaultAddress.get().getId() != address.getId()) {
+            if (defaultAddress.isPresent() && defaultAddress.get().getId().equals(address.getId())) {
                 Address defAddress = defaultAddress.get();
                 defAddress.setActive(false);
                 addressRepository.save(defAddress);

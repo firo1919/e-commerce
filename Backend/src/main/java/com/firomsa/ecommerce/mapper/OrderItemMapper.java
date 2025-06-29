@@ -4,6 +4,9 @@ import com.firomsa.ecommerce.dto.OrderItemResponseDTO;
 import com.firomsa.ecommerce.model.OrderItem;
 
 public class OrderItemMapper {
+
+    private OrderItemMapper(){}
+
     public static OrderItemResponseDTO toDTO(OrderItem orderItem){
         return OrderItemResponseDTO.builder()
                 .id(orderItem.getId())

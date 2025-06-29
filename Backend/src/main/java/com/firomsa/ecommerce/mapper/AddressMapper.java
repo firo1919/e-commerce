@@ -5,6 +5,9 @@ import com.firomsa.ecommerce.dto.AddressResponseDTO;
 import com.firomsa.ecommerce.model.Address;
 
 public class AddressMapper {
+    
+    private AddressMapper(){}
+
     public static AddressResponseDTO toDTO(Address address){
         return AddressResponseDTO.builder()
                 .id(address.getId())

@@ -44,9 +44,7 @@ public class StorageService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
         List<Image> images = product.getProductImages();
-        List<ImageDTO> imageDTOs = images.stream().map(ImageMapper::toDTO).toList();
-
-        return imageDTOs;
+        return images.stream().map(ImageMapper::toDTO).toList();
     }
 
     public Resource getImage(String imageName) {
@@ -102,9 +100,7 @@ public class StorageService {
             log.info("adding image entity to database");
 
             Image savedImage = imageRepository.save(image);
-            ImageDTO imageDTO = ImageMapper.toDTO(savedImage);
-
-            return imageDTO;
+            return ImageMapper.toDTO(savedImage);
 
         } catch (IOException e) {
             throw new StorageException("Failed to store Product image", e);

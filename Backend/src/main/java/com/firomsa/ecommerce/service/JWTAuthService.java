@@ -20,9 +20,11 @@ public class JWTAuthService {
     @Value("${public.key}")
     private RSAPublicKey publicKey;
 
+    private final Random random = new Random();
+
     // code to generate Token
     public String generateToken(String subject) {
-        String tokenId = String.valueOf(new Random().nextInt(10000));
+        String tokenId = String.valueOf(random.nextInt(10000));
         return Jwts.builder()
                 .header()
                 .keyId(tokenId)

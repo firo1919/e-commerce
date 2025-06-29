@@ -5,6 +5,9 @@ import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.model.Review;
 
 public class ReviewMapper {
+
+    private ReviewMapper(){}
+
     public static ReviewResponseDTO toDTO(Review review) {
         return ReviewResponseDTO.builder()
                 .id(review.getId())

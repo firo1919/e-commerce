@@ -5,6 +5,9 @@ import com.firomsa.ecommerce.dto.CategoryResponseDTO;
 import com.firomsa.ecommerce.model.Category;
 
 public class CategoryMapper {
+
+    private CategoryMapper(){}
+
     public static CategoryResponseDTO toDTO(Category category){
         return CategoryResponseDTO.builder()
                 .id(category.getId())

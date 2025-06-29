@@ -77,11 +77,14 @@ public class ProductController {
     @Operation(summary = "For deleting a product")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID id, @RequestParam Optional<Boolean> force) {
-        if (force.isPresent() && force.get() == true) {
-            productService.remove(id);
-        } else {
-            productService.softDelete(id);
-        }
+        force.ifPresentOrElse(val -> {
+            if (val) {
+                productService.remove(id);
+            } else {
+                productService.softDelete(id);
+            }
+        }, () -> productService.softDelete(id));
+
         return ResponseEntity.noContent().build();
     }
 
@@ -93,11 +96,12 @@ public class ProductController {
     }
 
     @Operation(summary = "For adding a product image")
-    @PostMapping(path = "/{id}/productImages", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-	public ResponseEntity<ImageDTO> uploadProductImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+    @PostMapping(path = "/{id}/productImages", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<ImageDTO> uploadProductImage(@PathVariable UUID id,
+            @RequestParam("file") MultipartFile file) {
         ImageDTO image = storageService.addProductImage(file, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(image);
-	}
+    }
 
     @Operation(summary = "For getting all product reviews")
     @GetMapping("/{id}/reviews")

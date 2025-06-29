@@ -5,6 +5,9 @@ import com.firomsa.ecommerce.dto.ProductResponseDTO;
 import com.firomsa.ecommerce.model.Product;
 
 public class ProductMapper {
+
+    private ProductMapper(){}
+
     public static ProductResponseDTO toDTO(Product product){
         return ProductResponseDTO.builder()
                 .id(product.getId().toString())

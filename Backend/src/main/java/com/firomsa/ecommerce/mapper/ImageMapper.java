@@ -4,6 +4,9 @@ import com.firomsa.ecommerce.dto.ImageDTO;
 import com.firomsa.ecommerce.model.Image;
 
 public class ImageMapper {
+
+    private ImageMapper(){}
+
     public static ImageDTO toDTO(Image image){
         return ImageDTO.builder()
                 .name(image.getName())

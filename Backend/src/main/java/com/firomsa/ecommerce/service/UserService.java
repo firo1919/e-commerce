@@ -198,7 +198,7 @@ public class UserService implements UserDetailsService{
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         Address address = AddressMapper.toModel(addressRequestDTO);
-        if (address.getActive()) {
+        if (Boolean.TRUE.equals(address.getActive())) {
             Optional<Address> defaultAddress = addressRepository.findByUserAndActive(user, true);
             if (defaultAddress.isPresent()) {
                 Address defAddress = defaultAddress.get();
@@ -235,10 +235,8 @@ public class UserService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails user = userRepository.findByUsername(username).orElseThrow(() ->
+        return userRepository.findByUsername(username).orElseThrow(() ->
             new UsernameNotFoundException("USER: "+username +"not found")
         );
-
-        return user;
     }
 }

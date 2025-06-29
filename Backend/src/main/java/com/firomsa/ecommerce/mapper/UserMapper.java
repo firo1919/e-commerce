@@ -7,6 +7,9 @@ import com.firomsa.ecommerce.dto.UserResponseDTO;
 import com.firomsa.ecommerce.model.User;
 
 public class UserMapper {
+
+    private UserMapper(){}
+
     public static UserResponseDTO toDTO(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId().toString())

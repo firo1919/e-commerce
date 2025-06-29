@@ -6,6 +6,9 @@ import com.firomsa.ecommerce.model.Order;
 import com.firomsa.ecommerce.model.OrderStatus;
 
 public class OrderMapper {
+
+    private OrderMapper(){}
+
     public static OrderResponseDTO toDTO(Order order){
         return OrderResponseDTO.builder()
                 .status(order.getStatus().toString())

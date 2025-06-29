@@ -68,11 +68,14 @@ public class UserController {
     @Operation(summary = "For deleting a user")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id, @RequestParam Optional<Boolean> force) {
-        if (force.isPresent() && force.get() == true) {
-            userService.remove(id);
-        } else {
-            userService.softDelete(id);
-        }
+        force.ifPresentOrElse(val -> {
+            if (val) {
+                userService.remove(id);
+            } else {
+                userService.softDelete(id);
+            }
+        }, () -> userService.softDelete(id));
+
         return ResponseEntity.noContent().build();
     }
 
@@ -109,7 +112,8 @@ public class UserController {
 
     @Operation(summary = "For adding an address to users addresses")
     @PostMapping("/{id}/addresses")
-    public ResponseEntity<AddressResponseDTO> addAddressToUserAddresses(@Valid @RequestBody AddressRequestDTO addressRequestDTO,
+    public ResponseEntity<AddressResponseDTO> addAddressToUserAddresses(
+            @Valid @RequestBody AddressRequestDTO addressRequestDTO,
             @PathVariable UUID id) {
         AddressResponseDTO address = userService.addAddressToAddresses(id, addressRequestDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/addresses/{id}")
@@ -126,7 +130,8 @@ public class UserController {
 
     @Operation(summary = "For adding a review to users reviews")
     @PostMapping("/{id}/reviews")
-    public ResponseEntity<ReviewResponseDTO> addReviewToUserReviews(@Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
+    public ResponseEntity<ReviewResponseDTO> addReviewToUserReviews(
+            @Valid @RequestBody ReviewRequestDTO reviewRequestDTO,
             @PathVariable UUID id, @RequestParam UUID productId) {
         ReviewResponseDTO review = userService.addReviewToReviews(id, reviewRequestDTO, productId);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/reviews/{id}")
