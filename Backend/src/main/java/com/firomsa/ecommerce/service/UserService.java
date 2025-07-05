@@ -22,6 +22,7 @@ import com.firomsa.ecommerce.dto.ReviewRequestDTO;
 import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
+import com.firomsa.ecommerce.exception.BannedUserException;
 import com.firomsa.ecommerce.exception.EmailAlreadyExistsException;
 import com.firomsa.ecommerce.exception.LimitedProductStockException;
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
@@ -249,8 +250,13 @@ public class UserService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(() ->
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
             new UsernameNotFoundException("USER: "+username +" Not found")
         );
+
+        if(!user.isActive()){
+            throw new BannedUserException(user.getFirstName());
+        }
+        return user;
     }
 }

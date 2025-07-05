@@ -116,7 +116,15 @@ public class GlobalExceptionHandler {
         
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
-    
+
+    @ExceptionHandler(BannedUserException.class)
+    public ResponseEntity<Map<String, String>> handleBannedUserException(BannedUserException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Map<String, String>> handleException(Exception exception) {
