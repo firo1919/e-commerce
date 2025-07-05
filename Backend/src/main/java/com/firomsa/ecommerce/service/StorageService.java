@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,14 +33,14 @@ public class StorageService {
 
     private final ImageRepository imageRepository;
     private final ProductRepository productRepository;
-    private final Path rootLocation;
+    private final Path rootLocation = Paths.get("/store");
 
     public StorageService(ProductRepository productRepository, ImageRepository imageRepository) {
         this.productRepository = productRepository;
         this.imageRepository = imageRepository;
-        this.rootLocation = Paths.get("/store");
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ImageDTO> getProductImages(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
@@ -47,6 +48,7 @@ public class StorageService {
         return images.stream().map(ImageMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public Resource getImage(String imageName) {
         if(!imageRepository.existsByName(imageName)){
             throw new ResourceNotFoundException("Image: "+imageName);
@@ -64,7 +66,7 @@ public class StorageService {
         }
     }
     
-
+    @PreAuthorize("hasRole('ADMIN')")
     public ImageDTO addProductImage(MultipartFile file, UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));

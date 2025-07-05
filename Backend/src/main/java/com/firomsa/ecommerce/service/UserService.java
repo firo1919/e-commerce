@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -69,10 +70,12 @@ public class UserService implements UserDetailsService{
         this.cartRepository = cartRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponseDTO> getAll() {
         return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
     public UserResponseDTO get(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -96,6 +99,7 @@ public class UserService implements UserDetailsService{
         return UserMapper.toDTO(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public UserResponseDTO createAdmin(UserRequestDTO userRequestDTO) {
         if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
@@ -113,6 +117,7 @@ public class UserService implements UserDetailsService{
         return UserMapper.toDTO(userRepository.save(admin));
     }
 
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     public UserResponseDTO update(UserRequestDTO userRequestDTO, UUID id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
 
@@ -134,12 +139,14 @@ public class UserService implements UserDetailsService{
         return UserMapper.toDTO(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void remove(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         userRepository.delete(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void softDelete(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -147,12 +154,14 @@ public class UserService implements UserDetailsService{
         userRepository.save(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
     public List<CartResponseDTO> getCarts(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getCarts().stream().map(CartMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     public CartResponseDTO addItemToCart(UUID id, CartRequestDTO cartRequestDTO, UUID productId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -181,12 +190,14 @@ public class UserService implements UserDetailsService{
         return CartMapper.toDTO(cartRepository.save(cart));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
     public List<OrderResponseDTO> getOrders(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getOrders().stream().map(OrderMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
     public List<AddressResponseDTO> getAddresses(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -194,6 +205,7 @@ public class UserService implements UserDetailsService{
     }
 
     @Transactional
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     public AddressResponseDTO addAddressToAddresses(UUID id, AddressRequestDTO addressRequestDTO) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -213,6 +225,7 @@ public class UserService implements UserDetailsService{
         return AddressMapper.toDTO(addressRepository.save(address));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
     public List<ReviewResponseDTO> getReviews(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -220,6 +233,7 @@ public class UserService implements UserDetailsService{
     }
 
     @Transactional
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     public ReviewResponseDTO addReviewToReviews(UUID id, ReviewRequestDTO reviewRequestDTO, UUID productId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
@@ -236,7 +250,7 @@ public class UserService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(() ->
-            new UsernameNotFoundException("USER: "+username +"not found")
+            new UsernameNotFoundException("USER: "+username +" Not found")
         );
     }
 }

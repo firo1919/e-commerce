@@ -2,6 +2,7 @@ package com.firomsa.ecommerce.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.firomsa.ecommerce.dto.ImageDTO;
@@ -18,16 +19,19 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ImageDTO> getAll() {
         return imageRepository.findAll().stream().map(ImageMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ImageDTO get(String name) {
         Image image = imageRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image: " + name));
         return ImageMapper.toDTO(image);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void remove(String name) {
         Image image = imageRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Image: " +

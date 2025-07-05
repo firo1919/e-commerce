@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +22,20 @@ public class AddressService {
     public AddressService(AddressRepository addressRepository){
         this.addressRepository = addressRepository;
     }
-
+    
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AddressResponseDTO> getAll() {
         return addressRepository.findAll().stream().map(AddressMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public AddressResponseDTO get(int id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address: " + id));
         return AddressMapper.toDTO(address);
     }
 
+    @PreAuthorize("hasRole('USER')")
     public void remove(int id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address: " +
@@ -40,6 +44,7 @@ public class AddressService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('USER')")
     public AddressResponseDTO update(AddressRequestDTO addressRequestDTO, int id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address: " + id));

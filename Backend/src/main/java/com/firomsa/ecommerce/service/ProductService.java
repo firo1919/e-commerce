@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +32,12 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ProductResponseDTO> getAll() {
         return productRepository.findAll().stream().map(ProductMapper::toDTO).toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public ProductResponseDTO get(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
@@ -42,6 +45,7 @@ public class ProductService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
         Product product = ProductMapper.toModel(productRequestDTO);
         List<CategoryRequestDTO> requestCategories = productRequestDTO.getCategories();
@@ -62,6 +66,7 @@ public class ProductService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductResponseDTO update(ProductRequestDTO productRequestDTO, UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
@@ -85,7 +90,8 @@ public class ProductService {
 
         return ProductMapper.toDTO(productRepository.save(product));
     }
-
+    
+    @PreAuthorize("hasRole('ADMIN')")
     public void remove(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " +
@@ -94,6 +100,7 @@ public class ProductService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void softDelete(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
@@ -101,6 +108,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ReviewResponseDTO> getReviews(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));

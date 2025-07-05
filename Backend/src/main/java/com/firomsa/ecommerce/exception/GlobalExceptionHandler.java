@@ -3,18 +3,29 @@ package com.firomsa.ecommerce.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import com.firomsa.ecommerce.EcommerceApplication;
 
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    private final EcommerceApplication ecommerceApplication;
+
+    GlobalExceptionHandler(EcommerceApplication ecommerceApplication) {
+        this.ecommerceApplication = ecommerceApplication;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException exception){
@@ -86,6 +97,24 @@ public class GlobalExceptionHandler {
         error.put("message",exception.getMessage());
         
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAuthorizationDeniedException(AuthorizationDeniedException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
     
 

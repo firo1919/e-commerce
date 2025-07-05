@@ -14,6 +14,9 @@ import io.jsonwebtoken.Jwts;
 
 @Service
 public class JWTAuthService {
+
+    private static final int MINUTES = 60;
+    
     @Value("${private.key}")
     private RSAPrivateKey privateKey;
 
@@ -31,7 +34,7 @@ public class JWTAuthService {
                 .and()
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)))
+                .expiration(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(MINUTES)))
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
     }
