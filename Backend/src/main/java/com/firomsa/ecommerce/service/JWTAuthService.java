@@ -1,13 +1,12 @@
 package com.firomsa.ecommerce.service;
 
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.firomsa.ecommerce.config.RSAConfig;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,14 +15,12 @@ import io.jsonwebtoken.Jwts;
 public class JWTAuthService {
 
     private static final int MINUTES = 60;
-    
-    @Value("${private.key}")
-    private RSAPrivateKey privateKey;
-
-    @Value("${public.key}")
-    private RSAPublicKey publicKey;
-
+    private final RSAConfig rsaConfig;
     private final Random random = new Random();
+
+    public JWTAuthService(RSAConfig rsaConfig) {
+        this.rsaConfig = rsaConfig;
+    }
 
     // code to generate Token
     public String generateToken(String subject) {
@@ -35,7 +32,7 @@ public class JWTAuthService {
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(MINUTES)))
-                .signWith(privateKey, Jwts.SIG.RS256)
+                .signWith(rsaConfig.getPrivateKey(), Jwts.SIG.RS256)
                 .compact();
     }
 
@@ -43,7 +40,7 @@ public class JWTAuthService {
     public Claims getClaims(String token) {
 
         return Jwts.parser()
-                .verifyWith(publicKey)
+                .verifyWith(rsaConfig.getPublicKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

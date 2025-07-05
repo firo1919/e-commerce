@@ -14,6 +14,11 @@ services:
             - SPRING_SQL_INIT_MODE
             - SPRING_JPA_DEFERDATASOURCEINITIALIZATION
             - SPRING_SQL_INIT_CONTINUEONERROR
+            - ADMIN_USERNAME
+            - ADMIN_PASSWORD
+            - ADMIN_EMAIL
+            - ADMIN_FIRSTNAME
+            - ADMIN_LASTNAME
         image: firo1919/ecommerce-backend:dev
         networks:
             - app
