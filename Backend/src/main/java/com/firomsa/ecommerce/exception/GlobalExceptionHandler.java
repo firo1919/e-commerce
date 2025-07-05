@@ -13,19 +13,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.firomsa.ecommerce.EcommerceApplication;
-
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
-    private final EcommerceApplication ecommerceApplication;
-
-    GlobalExceptionHandler(EcommerceApplication ecommerceApplication) {
-        this.ecommerceApplication = ecommerceApplication;
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException exception){
