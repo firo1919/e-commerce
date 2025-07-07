@@ -19,6 +19,9 @@ services:
             - ADMIN_EMAIL
             - ADMIN_FIRSTNAME
             - ADMIN_LASTNAME
+            - SPRING_MAIL_USERNAME
+            - SPRING_MAIL_PASSWORD
+            - COMPANY_MAIL
         image: firo1919/ecommerce-backend:dev
         networks:
             - app

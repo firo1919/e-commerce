@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final ReviewRepository reviewRepository;
@@ -120,7 +120,8 @@ public class UserService implements UserDetailsService{
 
     @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     public UserResponseDTO update(UserRequestDTO userRequestDTO, UUID id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
 
         if (userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)) {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
@@ -172,7 +173,7 @@ public class UserService implements UserDetailsService{
         LocalDateTime now = LocalDateTime.now();
         Cart cart;
         Optional<Cart> existingCart = cartRepository.findByUserAndProduct(user, product);
-        if(cartRequestDTO.getQuantity() > product.getStock()){
+        if (cartRequestDTO.getQuantity() > product.getStock()) {
             throw new LimitedProductStockException("Product Stock Limited");
         }
         if (existingCart.isPresent()) {
@@ -238,7 +239,8 @@ public class UserService implements UserDetailsService{
     public ReviewResponseDTO addReviewToReviews(UUID id, ReviewRequestDTO reviewRequestDTO, UUID productId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product: " + productId.toString()));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + productId.toString()));
         Review review = ReviewMapper.toModel(reviewRequestDTO);
         LocalDateTime now = LocalDateTime.now();
         review.setUser(user);
@@ -250,11 +252,10 @@ public class UserService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(() ->
-            new UsernameNotFoundException("USER: "+username +" Not found")
-        );
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("USER: " + username + " Not found"));
 
-        if(!user.isActive()){
+        if (!user.isActive()) {
             throw new BannedUserException(user.getFirstName());
         }
         return user;

@@ -91,6 +91,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(InvalidConfirmationTokenException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidConfirmationTokenException(InvalidConfirmationTokenException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException exception){
         Map<String, String> error = new HashMap<>();

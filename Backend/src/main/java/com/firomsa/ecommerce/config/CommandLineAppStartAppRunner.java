@@ -45,7 +45,6 @@ public class CommandLineAppStartAppRunner implements CommandLineRunner {
                     .build();
             userRepository.save(admin);
         }
-
     }
 
 }

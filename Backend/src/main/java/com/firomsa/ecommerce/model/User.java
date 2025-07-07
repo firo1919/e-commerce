@@ -79,6 +79,10 @@ public class User implements UserDetails{
     @Builder.Default
     private List<Cart> carts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<ConfirmationToken> confirmationTokens = new ArrayList<>();
+
     @NotNull
     private LocalDateTime createdAt;
 
