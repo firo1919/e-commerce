@@ -57,7 +57,7 @@ public class User implements UserDetails{
 
     @NotNull
     @Builder.Default
-    private boolean active = Boolean.TRUE;
+    private boolean active = Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
@@ -94,4 +94,8 @@ public class User implements UserDetails{
         return List.of(new SimpleGrantedAuthority("ROLE_"+role.getName()));
     }
     
+    @Override
+    public boolean isEnabled() {
+		return this.active;
+	}
 }

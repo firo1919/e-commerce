@@ -95,7 +95,6 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role: USER"));
         User user = UserMapper.toModel(userRequestDTO);
         user.setRole(role);
-        user.setActive(true);
         user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         return UserMapper.toDTO(userRepository.save(user));
     }
@@ -252,12 +251,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("USER: " + username + " Not found"));
-
-        if (!user.isActive()) {
-            throw new BannedUserException(user.getFirstName());
-        }
-        return user;
     }
 }

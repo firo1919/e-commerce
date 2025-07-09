@@ -13,7 +13,4 @@ import lombok.NoArgsConstructor;
 public class ConfirmationTokenDTO {
     @NotNull
     private String token;
-
-    @NotNull
-    private LoginUserDTO user;
 }
