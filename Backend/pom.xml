@@ -108,6 +108,12 @@
             <version>0.12.6</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.yaphet17/Chapa -->
+        <dependency>
+            <groupId>io.github.yaphet17</groupId>
+            <artifactId>Chapa</artifactId>
+            <version>1.2.2</version>
+        </dependency>
     </dependencies>
 
     <build>

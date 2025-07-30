@@ -17,6 +17,8 @@ import com.firomsa.ecommerce.dto.JWTResponseDTO;
 import com.firomsa.ecommerce.dto.LoginUserDTO;
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
+import com.firomsa.ecommerce.mapper.UserMapper;
+import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.service.ConfirmationTokenService;
 import com.firomsa.ecommerce.service.EmailService;
 import com.firomsa.ecommerce.service.JWTAuthService;
@@ -40,7 +42,8 @@ public class AuthController {
     private final EmailService emailService;
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager,
-            JWTAuthService jwtAuthService, ConfirmationTokenService confirmationTokenService, EmailService emailService) {
+            JWTAuthService jwtAuthService, ConfirmationTokenService confirmationTokenService,
+            EmailService emailService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtAuthService = jwtAuthService;
@@ -56,12 +59,14 @@ public class AuthController {
         confirmationTokenService.add(emailToken, user.getUsername());
         String email = user.getEmail();
         emailService.sendSimpleMessage(email, "Account Verification", emailToken);
-        return ResponseEntity.ok().body(Map.of("message", "Account created successfully ,  verify email via token sent to ur email"));
+        return ResponseEntity.ok()
+                .body(Map.of("message", "Account created successfully ,  verify email via token sent to ur email"));
     }
-    
+
     @Operation(summary = "For confirming a user through email")
     @PostMapping("/confirm")
-    public ResponseEntity<Map<String, String>> confirmUser(@Valid @RequestBody ConfirmationTokenDTO confirmationTokenDTO) {
+    public ResponseEntity<Map<String, String>> confirmUser(
+            @Valid @RequestBody ConfirmationTokenDTO confirmationTokenDTO) {
         confirmationTokenService.verifyToken(confirmationTokenDTO.getToken());
         return ResponseEntity.ok().body(Map.of("message", "Email token verified successfully"));
     }
@@ -69,12 +74,14 @@ public class AuthController {
     @Operation(summary = "For signing in a user")
     @PostMapping("/login")
     public ResponseEntity<JWTResponseDTO> loginUser(@Valid @RequestBody LoginUserDTO loginUserDTO) {
-        authenticationManager.authenticate(
+        Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginUserDTO.getUsername(), loginUserDTO.getPassword()));
         String token = jwtAuthService.generateToken(loginUserDTO.getUsername());
+        UserResponseDTO user = UserMapper.toDTO((User) auth.getPrincipal());
         JWTResponseDTO responseDTO = JWTResponseDTO.builder()
                 .token(token)
                 .message("Token generated successfully!")
+                .user(user)
                 .build();
         return ResponseEntity.ok().body(responseDTO);
     }

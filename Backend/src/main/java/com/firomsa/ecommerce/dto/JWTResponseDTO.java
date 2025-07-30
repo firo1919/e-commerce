@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class JWTResponseDTO {
     private String token;
     private String message;
+    private UserResponseDTO user;
 }

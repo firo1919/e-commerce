@@ -11,4 +11,5 @@ import com.firomsa.ecommerce.model.User;
 public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     Optional<Cart> findByUserAndProduct(User user, Product product);
+    void deleteAllByUser(User user);
 }

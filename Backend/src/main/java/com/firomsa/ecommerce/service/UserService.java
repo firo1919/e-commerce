@@ -25,6 +25,7 @@ import com.firomsa.ecommerce.dto.UserResponseDTO;
 import com.firomsa.ecommerce.exception.BannedUserException;
 import com.firomsa.ecommerce.exception.EmailAlreadyExistsException;
 import com.firomsa.ecommerce.exception.LimitedProductStockException;
+import com.firomsa.ecommerce.exception.OrderProcessException;
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.exception.UserNameAlreadyExistsException;
 import com.firomsa.ecommerce.mapper.AddressMapper;
@@ -34,12 +35,16 @@ import com.firomsa.ecommerce.mapper.ReviewMapper;
 import com.firomsa.ecommerce.mapper.UserMapper;
 import com.firomsa.ecommerce.model.Address;
 import com.firomsa.ecommerce.model.Cart;
+import com.firomsa.ecommerce.model.Order;
+import com.firomsa.ecommerce.model.OrderItem;
 import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.model.Review;
 import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.AddressRepository;
 import com.firomsa.ecommerce.repository.CartRepository;
+import com.firomsa.ecommerce.repository.OrderItemRepository;
+import com.firomsa.ecommerce.repository.OrderRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 import com.firomsa.ecommerce.repository.ReviewRepository;
 import com.firomsa.ecommerce.repository.RoleRepository;
@@ -58,10 +63,13 @@ public class UserService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
 
     public UserService(PasswordEncoder passwordEncoder, ReviewRepository reviewRepository,
             AddressRepository addressRepository, UserRepository userRepository, RoleRepository roleRepository,
-            ProductRepository productRepository, CartRepository cartRepository) {
+            ProductRepository productRepository, CartRepository cartRepository,
+            OrderItemRepository orderItemRepository, OrderRepository orderRepository) {
         this.passwordEncoder = passwordEncoder;
         this.reviewRepository = reviewRepository;
         this.addressRepository = addressRepository;
@@ -69,11 +77,23 @@ public class UserService implements UserDetailsService {
         this.roleRepository = roleRepository;
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.orderRepository = orderRepository;
+
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponseDTO> getAll() {
-        return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
+        return userRepository.findAll().stream()
+                .filter(User::isActive)
+                .map(UserMapper::toDTO).toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponseDTO> getAllInActiveUsers() {
+        return userRepository.findAll().stream()
+                .filter(e -> (!e.isActive()))
+                .map(UserMapper::toDTO).toList();
     }
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")
@@ -177,8 +197,7 @@ public class UserService implements UserDetailsService {
         }
         if (existingCart.isPresent()) {
             cart = existingCart.get();
-            int quantity = cart.getQuantity();
-            cart.setQuantity(quantity + cartRequestDTO.getQuantity());
+            cart.setQuantity(cartRequestDTO.getQuantity());
             cart.setUpdatedAt(now);
         } else {
             cart = CartMapper.toModel(cartRequestDTO);
@@ -196,6 +215,37 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         return user.getOrders().stream().map(OrderMapper::toDTO).toList();
+    }
+
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
+    @Transactional
+    public OrderResponseDTO addOrder(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        LocalDateTime now = LocalDateTime.now();
+        List<Cart> cartItems = user.getCarts();
+        if(cartItems.isEmpty()){
+            throw new OrderProcessException("The cart doesnt contain any items");
+        }
+        Double total = cartItems.stream().map(item -> item.getProduct().getPrice()*item.getQuantity()).reduce(Double::sum).orElse(0.0);
+        Order order = Order.builder()
+                .createdAt(now)
+                .updatedAt(now)
+                .user(user)
+                .totalPrice(total)
+                .build();
+        Order savedOrder = orderRepository.save(order);
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(item -> OrderItem.builder()
+                        .priceAtPurchase(item.getProduct().getPrice())
+                        .product(item.getProduct())
+                        .order(savedOrder)
+                        .quantity(item.getQuantity()).build())
+                .toList();
+        
+        orderItemRepository.saveAll(orderItems);
+        cartRepository.deleteAllByUser(user);
+        return OrderMapper.toDTO(savedOrder);
     }
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")

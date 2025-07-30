@@ -83,6 +83,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(OrderProcessException.class)
+    public ResponseEntity<Map<String, String>> handleOrderProcessException(OrderProcessException exception){
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message",exception.getMessage());
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException exception){
         Map<String, String> error = new HashMap<>();

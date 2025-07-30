@@ -19,6 +19,7 @@ import com.firomsa.ecommerce.mapper.ProductMapper;
 import com.firomsa.ecommerce.mapper.ReviewMapper;
 import com.firomsa.ecommerce.model.Category;
 import com.firomsa.ecommerce.model.Product;
+import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.CategoryRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 
@@ -34,7 +35,16 @@ public class ProductService {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ProductResponseDTO> getAll() {
-        return productRepository.findAll().stream().map(ProductMapper::toDTO).toList();
+        return productRepository.findAll().stream()
+                .filter(Product::isActive)
+                .map(ProductMapper::toDTO).toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public List<ProductResponseDTO> getAllInActiveProducts() {
+        return productRepository.findAll().stream()
+                .filter(e -> (!e.isActive()))
+                .map(ProductMapper::toDTO).toList();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
@@ -90,7 +100,7 @@ public class ProductService {
 
         return ProductMapper.toDTO(productRepository.save(product));
     }
-    
+
     @PreAuthorize("hasRole('ADMIN')")
     public void remove(UUID id) {
         Product product = productRepository.findById(id)

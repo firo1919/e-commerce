@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +32,17 @@ public class Order {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @NotNull
-    private OrderStatus status;
+    @Builder.Default
+    private OrderStatus status = OrderStatus.PENDING;
 
     @NotNull
     private Double totalPrice;
 
-    @NotNull
-    private LocalDate createdAt;
+    private String txRef;
 
     @NotNull
-    private LocalDate updatedAt;
+    private LocalDateTime createdAt;
+
+    @NotNull
+    private LocalDateTime updatedAt;
 }

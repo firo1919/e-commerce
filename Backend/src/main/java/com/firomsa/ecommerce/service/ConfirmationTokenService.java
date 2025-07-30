@@ -43,11 +43,13 @@ public class ConfirmationTokenService {
     public void verifyToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidConfirmationTokenException("Invalid confirmation token"));
+        if (confirmationToken.getUser().isActive()) {
+            throw new InvalidConfirmationTokenException("User already veryfied");
+        }
         LocalDateTime now = LocalDateTime.now();
         if (!now.isBefore(confirmationToken.getExpiresAt())) {
             throw new InvalidConfirmationTokenException("The confirmation token has expired");
-        }
-        else if(confirmationToken.getConfirmedAt() != null){
+        } else if (confirmationToken.getConfirmedAt() != null) {
             throw new InvalidConfirmationTokenException("Token already used");
         }
 
