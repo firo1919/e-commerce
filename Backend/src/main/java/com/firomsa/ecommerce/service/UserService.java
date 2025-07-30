@@ -247,8 +247,9 @@ public class UserService implements UserDetailsService {
                         .quantity(item.getQuantity()).build())
                 .toList();
 
-        orderItemRepository.saveAll(orderItems);
+        List<OrderItem> savedOrderItems = orderItemRepository.saveAll(orderItems);
         cartRepository.deleteAllByUser(user);
+        savedOrder.setOrderItems(savedOrderItems);
         InitializeResponseData response = paymentService.startTransaction(savedOrder);
         OrderDetailDTO orderDetailDTO = OrderDetailDTO.builder()
                 .response(response)

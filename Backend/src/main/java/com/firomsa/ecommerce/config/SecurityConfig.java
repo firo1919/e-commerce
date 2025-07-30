@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request -> request.requestMatchers(
                         "/api/auth/**",
+                        "/api/webhook/**",
                         "/v3/api-docs",
                         "/v3/api-docs/**",
                         "/swagger-resources/**",

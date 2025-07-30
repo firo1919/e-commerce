@@ -7,9 +7,10 @@ import com.firomsa.ecommerce.model.OrderStatus;
 
 public class OrderMapper {
 
-    private OrderMapper(){}
+    private OrderMapper() {
+    }
 
-    public static OrderResponseDTO toDTO(Order order){
+    public static OrderResponseDTO toDTO(Order order) {
         return OrderResponseDTO.builder()
                 .status(order.getStatus().toString())
                 .totalPrice(order.getTotalPrice())
@@ -18,10 +19,11 @@ public class OrderMapper {
                 .updatedAt(order.getUpdatedAt().toString())
                 .id(order.getId())
                 .userId(order.getUser().getId().toString())
+                .txRef(order.getTxRef())
                 .build();
     }
 
-    public static Order toModel(OrderRequestDTO orderRequestDTO){
+    public static Order toModel(OrderRequestDTO orderRequestDTO) {
         return Order.builder()
                 .status(OrderStatus.valueOf(orderRequestDTO.getStatus()))
                 .build();

@@ -14,6 +14,7 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "chapa")
 public class PaymentConfig {
     private String secret;
+    private String encription;
 
     @Bean
     public Chapa chapa() {

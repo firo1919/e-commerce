@@ -22,6 +22,8 @@ services:
             - SPRING_MAIL_USERNAME
             - SPRING_MAIL_PASSWORD
             - COMPANY_MAIL
+            - CHAPA_SECRET_KEY
+            - CHAPA_ENCRIPTION_KEY
         image: firo1919/ecommerce-backend:dev
         networks:
             - app
