@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class JWTResponseDTO {
-    private String accessToken;
+public class RefreshTokenDTO {
     private String refreshToken;
-    private String message;
-    private UserResponseDTO user;
 }

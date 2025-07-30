@@ -21,128 +21,141 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException exception){
+    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
         exception.getBindingResult()
                 .getFieldErrors()
-                .forEach( error -> errors.put(error.getField(), error.getDefaultMessage()) );
-        
+                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
         return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmailException(EmailAlreadyExistsException exception){
+    public ResponseEntity<Map<String, String>> handleEmailException(EmailAlreadyExistsException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn("Email address already exist: {}", exception.getMessage());
         error.put("message", "Email address already exists");
-        
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(UserNameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleUserNameException(UserNameAlreadyExistsException exception){
+    public ResponseEntity<Map<String, String>> handleUserNameException(UserNameAlreadyExistsException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn("UserName already exist: {}", exception.getMessage());
         error.put("message", "UserName already exists");
-        
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception){
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn("resource with this id doesnt exist: {} ", exception.getMessage());
         error.put("message", "resource with this id doesnt exist " + exception.getMessage());
-        
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(StorageException.class)
-    public ResponseEntity<Map<String, String>> handleStorageException(StorageException exception){
+    public ResponseEntity<Map<String, String>> handleStorageException(StorageException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage(), exception.getCause().getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(LimitedProductStockException.class)
-    public ResponseEntity<Map<String, String>> handleLimitedProductStockException(LimitedProductStockException exception){
+    public ResponseEntity<Map<String, String>> handleLimitedProductStockException(
+            LimitedProductStockException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
+
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException exception){
+    public ResponseEntity<Map<String, String>> handleNoResourceFoundException(NoResourceFoundException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(OrderProcessException.class)
-    public ResponseEntity<Map<String, String>> handleOrderProcessException(OrderProcessException exception){
+    public ResponseEntity<Map<String, String>> handleOrderProcessException(OrderProcessException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException exception){
+    public ResponseEntity<Map<String, String>> handleBadCredentialsException(BadCredentialsException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(InvalidConfirmationTokenException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidConfirmationTokenException(InvalidConfirmationTokenException exception){
+    public ResponseEntity<Map<String, String>> handleInvalidConfirmationTokenException(
+            InvalidConfirmationTokenException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException exception) {
+        Map<String, String> error = new HashMap<>();
+        log.warn(exception.getMessage());
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException exception){
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(UsernameNotFoundException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<Map<String, String>> handleAuthorizationDeniedException(AuthorizationDeniedException exception){
+    public ResponseEntity<Map<String, String>> handleAuthorizationDeniedException(
+            AuthorizationDeniedException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<Map<String, String>> handleDisabledException(DisabledException exception){
+    public ResponseEntity<Map<String, String>> handleDisabledException(DisabledException exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
-        error.put("message",exception.getMessage());
-        
+        error.put("message", exception.getMessage());
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({ Exception.class })
     public ResponseEntity<Map<String, String>> handleException(Exception exception) {
         Map<String, String> error = new HashMap<>();
         log.warn(exception.getMessage());
         error.put("message", "something happened in the server");
-        
+
         return ResponseEntity.internalServerError().body(error);
     }
 

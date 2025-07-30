@@ -22,7 +22,6 @@ import com.firomsa.ecommerce.dto.ReviewRequestDTO;
 import com.firomsa.ecommerce.dto.ReviewResponseDTO;
 import com.firomsa.ecommerce.dto.UserRequestDTO;
 import com.firomsa.ecommerce.dto.UserResponseDTO;
-import com.firomsa.ecommerce.exception.BannedUserException;
 import com.firomsa.ecommerce.exception.EmailAlreadyExistsException;
 import com.firomsa.ecommerce.exception.LimitedProductStockException;
 import com.firomsa.ecommerce.exception.OrderProcessException;
@@ -146,7 +145,7 @@ public class UserService implements UserDetailsService {
             throw new EmailAlreadyExistsException(userRequestDTO.getEmail());
         }
 
-        if (userRepository.existsByUsername(userRequestDTO.getUsername())) {
+        if (userRepository.existsByUsernameAndIdNot(userRequestDTO.getUsername(), id)) {
             throw new UserNameAlreadyExistsException(userRequestDTO.getUsername());
         }
 
@@ -154,7 +153,7 @@ public class UserService implements UserDetailsService {
         user.setFirstName(userRequestDTO.getFirstName());
         user.setUsername(userRequestDTO.getUsername());
         user.setEmail(userRequestDTO.getEmail());
-        user.setPassword(userRequestDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         user.setUpdatedAt(LocalDateTime.now());
 
         return UserMapper.toDTO(userRepository.save(user));
@@ -224,10 +223,11 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         LocalDateTime now = LocalDateTime.now();
         List<Cart> cartItems = user.getCarts();
-        if(cartItems.isEmpty()){
+        if (cartItems.isEmpty()) {
             throw new OrderProcessException("The cart doesnt contain any items");
         }
-        Double total = cartItems.stream().map(item -> item.getProduct().getPrice()*item.getQuantity()).reduce(Double::sum).orElse(0.0);
+        Double total = cartItems.stream().map(item -> item.getProduct().getPrice() * item.getQuantity())
+                .reduce(Double::sum).orElse(0.0);
         Order order = Order.builder()
                 .createdAt(now)
                 .updatedAt(now)
@@ -242,7 +242,7 @@ public class UserService implements UserDetailsService {
                         .order(savedOrder)
                         .quantity(item.getQuantity()).build())
                 .toList();
-        
+
         orderItemRepository.saveAll(orderItems);
         cartRepository.deleteAllByUser(user);
         return OrderMapper.toDTO(savedOrder);

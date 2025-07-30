@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class User implements UserDetails{
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue
@@ -83,6 +83,10 @@ public class User implements UserDetails{
     @Builder.Default
     private List<ConfirmationToken> confirmationTokens = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
+
     @NotNull
     private LocalDateTime createdAt;
 
@@ -91,11 +95,11 @@ public class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_"+role.getName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName()));
     }
-    
+
     @Override
     public boolean isEnabled() {
-		return this.active;
-	}
+        return this.active;
+    }
 }
