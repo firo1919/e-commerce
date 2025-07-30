@@ -14,7 +14,7 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JWTAuthService {
 
-    private static final int JWT_DURATION = 5;
+    private static final int JWT_DURATION = 15;
     private final RSAConfig rsaConfig;
     private final Random random = new Random();
 

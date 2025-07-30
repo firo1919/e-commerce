@@ -21,6 +21,7 @@ import com.firomsa.ecommerce.dto.AddressRequestDTO;
 import com.firomsa.ecommerce.dto.AddressResponseDTO;
 import com.firomsa.ecommerce.dto.CartRequestDTO;
 import com.firomsa.ecommerce.dto.CartResponseDTO;
+import com.firomsa.ecommerce.dto.OrderDetailDTO;
 import com.firomsa.ecommerce.dto.OrderResponseDTO;
 import com.firomsa.ecommerce.dto.ReviewRequestDTO;
 import com.firomsa.ecommerce.dto.ReviewResponseDTO;
@@ -101,6 +102,13 @@ public class UserController {
     public ResponseEntity<List<OrderResponseDTO>> getUserOrders(@PathVariable UUID id) {
         List<OrderResponseDTO> orders = userService.getOrders(id);
         return ResponseEntity.ok().body(orders);
+    }
+
+    @Operation(summary = "For creating order")
+    @PostMapping("/{id}/orders")
+    public ResponseEntity<OrderDetailDTO> createOrder(@PathVariable UUID id) {
+        OrderDetailDTO orderDetailDTO = userService.addOrder(id);
+        return ResponseEntity.ok().body(orderDetailDTO);
     }
 
     @Operation(summary = "For getting all users addresses")

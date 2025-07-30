@@ -17,6 +17,7 @@ import com.firomsa.ecommerce.dto.AddressRequestDTO;
 import com.firomsa.ecommerce.dto.AddressResponseDTO;
 import com.firomsa.ecommerce.dto.CartRequestDTO;
 import com.firomsa.ecommerce.dto.CartResponseDTO;
+import com.firomsa.ecommerce.dto.OrderDetailDTO;
 import com.firomsa.ecommerce.dto.OrderResponseDTO;
 import com.firomsa.ecommerce.dto.ReviewRequestDTO;
 import com.firomsa.ecommerce.dto.ReviewResponseDTO;
@@ -48,6 +49,7 @@ import com.firomsa.ecommerce.repository.ProductRepository;
 import com.firomsa.ecommerce.repository.ReviewRepository;
 import com.firomsa.ecommerce.repository.RoleRepository;
 import com.firomsa.ecommerce.repository.UserRepository;
+import com.yaphet.chapa.model.InitializeResponseData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,11 +66,12 @@ public class UserService implements UserDetailsService {
     private final CartRepository cartRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
+    private final PaymentService paymentService;
 
     public UserService(PasswordEncoder passwordEncoder, ReviewRepository reviewRepository,
             AddressRepository addressRepository, UserRepository userRepository, RoleRepository roleRepository,
             ProductRepository productRepository, CartRepository cartRepository,
-            OrderItemRepository orderItemRepository, OrderRepository orderRepository) {
+            OrderItemRepository orderItemRepository, OrderRepository orderRepository, PaymentService paymentService) {
         this.passwordEncoder = passwordEncoder;
         this.reviewRepository = reviewRepository;
         this.addressRepository = addressRepository;
@@ -78,6 +81,7 @@ public class UserService implements UserDetailsService {
         this.cartRepository = cartRepository;
         this.orderItemRepository = orderItemRepository;
         this.orderRepository = orderRepository;
+        this.paymentService = paymentService;
 
     }
 
@@ -218,13 +222,13 @@ public class UserService implements UserDetailsService {
 
     @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#id)")
     @Transactional
-    public OrderResponseDTO addOrder(UUID id) {
+    public OrderDetailDTO addOrder(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
         LocalDateTime now = LocalDateTime.now();
         List<Cart> cartItems = user.getCarts();
         if (cartItems.isEmpty()) {
-            throw new OrderProcessException("The cart doesnt contain any items");
+            throw new OrderProcessException("The cart doesn't contain any items");
         }
         Double total = cartItems.stream().map(item -> item.getProduct().getPrice() * item.getQuantity())
                 .reduce(Double::sum).orElse(0.0);
@@ -245,7 +249,12 @@ public class UserService implements UserDetailsService {
 
         orderItemRepository.saveAll(orderItems);
         cartRepository.deleteAllByUser(user);
-        return OrderMapper.toDTO(savedOrder);
+        InitializeResponseData response = paymentService.startTransaction(savedOrder);
+        OrderDetailDTO orderDetailDTO = OrderDetailDTO.builder()
+                .response(response)
+                .order(OrderMapper.toDTO(savedOrder))
+                .build();
+        return orderDetailDTO;
     }
 
     @PreAuthorize("hasRole('ADMIN') or authentication.principal.id.equals(#id)")

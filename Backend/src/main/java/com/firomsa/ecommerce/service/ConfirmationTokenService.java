@@ -1,6 +1,7 @@
 package com.firomsa.ecommerce.service;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,18 +19,22 @@ public class ConfirmationTokenService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserRepository userRepository;
-    private static final long TOKEN_DURATION = 10;
+    private final EmailService emailService;
+
+    private static final long TOKEN_DURATION = 6;
 
     public ConfirmationTokenService(ConfirmationTokenRepository confirmationTokenRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, EmailService emailService) {
         this.confirmationTokenRepository = confirmationTokenRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
-    public void add(String emailtoken, String username) {
-        ConfirmationToken token = ConfirmationToken.builder().token(emailtoken).build();
+    public void generateToken(String username, String email) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("USER: " + username + " Not found"));
+        String emailToken = createRandomOneTimePassword();
+        ConfirmationToken token = ConfirmationToken.builder().token(emailToken).build();
 
         LocalDateTime createdAt = LocalDateTime.now();
         LocalDateTime expiresAt = createdAt.plusMinutes(TOKEN_DURATION);
@@ -37,6 +42,7 @@ public class ConfirmationTokenService {
         token.setExpiresAt(expiresAt);
         token.setUser(user);
         confirmationTokenRepository.save(token);
+        emailService.sendSimpleMessage(email, "Account Verification", emailToken);
     }
 
     @Transactional
@@ -58,5 +64,36 @@ public class ConfirmationTokenService {
         confirmationToken.setConfirmedAt(now);
         userRepository.save(user);
         confirmationTokenRepository.save(confirmationToken);
+    }
+
+    public void resendToken(String username, String email) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("USER: " + username + " Not found"));
+        if (user.isActive()) {
+            throw new InvalidConfirmationTokenException("User already veryfied");
+        }
+        if (confirmationTokenRepository.findByUserAndExpiresAtAfter(user, LocalDateTime.now()).isPresent()) {
+            throw new InvalidConfirmationTokenException("An active confirmation token already exists");
+        }
+        String emailToken = createRandomOneTimePassword();
+        ConfirmationToken token = ConfirmationToken.builder().token(emailToken).build();
+
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime expiresAt = createdAt.plusMinutes(TOKEN_DURATION);
+        token.setCreatedAt(createdAt);
+        token.setExpiresAt(expiresAt);
+        token.setUser(user);
+        confirmationTokenRepository.save(token);
+        emailService.sendSimpleMessage(email, "Account Verification", emailToken);
+    }
+
+    public static String createRandomOneTimePassword() {
+        Random random = new Random();
+        StringBuilder oneTimePassword = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            int randomNumber = random.nextInt(10);
+            oneTimePassword.append(randomNumber);
+        }
+        return oneTimePassword.toString().trim();
     }
 }
