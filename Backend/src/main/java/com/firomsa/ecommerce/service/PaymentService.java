@@ -3,9 +3,9 @@ package com.firomsa.ecommerce.service;
 import java.math.BigDecimal;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.firomsa.ecommerce.exception.OrderProcessException;
+import com.firomsa.ecommerce.model.Address;
 import com.firomsa.ecommerce.model.Order;
 import com.firomsa.ecommerce.repository.OrderRepository;
 import com.yaphet.chapa.Chapa;
@@ -31,15 +31,18 @@ public class PaymentService {
 
     public InitializeResponseData startTransaction(Order order) {
         String txRef = Util.generateToken();
+        Address defAddress = order.getUser().getAddresses()
+                .stream().filter(addr -> addr.getActive())
+                .toList()
+                .getFirst();
         PostData postData = new PostData()
                 .setAmount(BigDecimal.valueOf(order.getTotalPrice()))
                 .setCurrency("ETB")
-                .setFirstName(order.getUser().getFirstName())
-                .setLastName(order.getUser().getLastName())
+                .setFirstName(defAddress.getFirstName())
+                .setLastName(defAddress.getLastName())
                 .setEmail(order.getUser().getEmail())
                 .setTxRef(txRef)
                 .setCallbackUrl("https://chapa.co")
-                .setReturnUrl("https://chapa.co")
                 .setSubAccountId("testSubAccountId")
                 .setCustomization(customization);
         InitializeResponseData responseData;
@@ -51,7 +54,7 @@ public class PaymentService {
         }
         order.setTxRef(txRef);
         orderRepository.save(order);
-        
+
         return responseData;
     }
 }

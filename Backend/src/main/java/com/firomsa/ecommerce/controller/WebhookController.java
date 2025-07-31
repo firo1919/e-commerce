@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firomsa.ecommerce.config.PaymentConfig;
 import com.firomsa.ecommerce.dto.ChapaResponse;
+import com.firomsa.ecommerce.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,28 +32,29 @@ import lombok.extern.slf4j.Slf4j;
 public class WebhookController {
 
     private final PaymentConfig paymentConfig;
+    private final OrderService orderService;
 
-    public WebhookController(PaymentConfig paymentConfig) {
+    public WebhookController(PaymentConfig paymentConfig, OrderService orderService) {
         this.paymentConfig = paymentConfig;
+        this.orderService = orderService;
     }
 
     @Operation(summary = "Webhook event listener for chapa payment")
     @PostMapping("/payment")
     public ResponseEntity<Void> chapaWebhook(@RequestHeader HttpHeaders headers,
             @Valid @RequestBody String rawBody) {
-        String signature = headers.getFirst("chapa-signature");
+        String signatureOne = headers.getFirst("x-chapa-signature");
+        String signatureTwo = headers.getFirst("chapa-signature");
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String computedHash = hmacSha256(rawBody, paymentConfig.getEncription());
-            log.info(computedHash + " " + signature);
-            if (computedHash.equalsIgnoreCase(signature)) {
+            if (computedHash.equalsIgnoreCase(signatureOne) || computedHash.equalsIgnoreCase(signatureTwo)) {
                 ChapaResponse response = objectMapper.readValue(rawBody, ChapaResponse.class);
-                log.info("Valid signature");
-                log.info("Event: {}", response);
-
+                log.info("Valid webhook signature");
+                orderService.updateStatus(response.getStatus(), response.getTx_ref());
                 return ResponseEntity.noContent().build();
             } else {
-                log.warn("Invalid signature");
+                log.warn("Invalid webhook signature");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 

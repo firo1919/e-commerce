@@ -19,6 +19,7 @@ public class ChapaResponse {
     private String amount;
     private String charge;
     private String status;
+    private String failure_reason;
     private String mode;
     private String reference;
     private String created_at;

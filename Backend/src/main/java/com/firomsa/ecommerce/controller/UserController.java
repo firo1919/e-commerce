@@ -129,6 +129,21 @@ public class UserController {
         return ResponseEntity.created(location).body(address);
     }
 
+    @Operation(summary = "For updating an address")
+    @PutMapping("/{userId}/addresses/{addressId}")
+    public ResponseEntity<AddressResponseDTO> updateAddress(@Valid @RequestBody AddressRequestDTO addressRequestDTO,
+            @PathVariable int addressId, @PathVariable UUID userId) {
+        AddressResponseDTO address = userService.updateAddress(addressRequestDTO, addressId, userId);
+        return ResponseEntity.ok().body(address);
+    }
+
+    @Operation(summary = "For deleting a address")
+    @DeleteMapping("/{userId}/addresses/{addressId}")
+    public ResponseEntity<Void> deleteCart(@PathVariable int addressId, @PathVariable UUID userId) {
+        userService.removeAddress(addressId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "For getting all users reviews")
     @GetMapping("/{id}/reviews")
     public ResponseEntity<List<ReviewResponseDTO>> getUserReviews(@PathVariable UUID id) {

@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class OrderDetailDTO {
     private OrderResponseDTO order;
     private InitializeResponseData response;
+    private AddressResponseDTO address;
 }

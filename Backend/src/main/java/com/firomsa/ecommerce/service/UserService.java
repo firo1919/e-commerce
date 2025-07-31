@@ -225,10 +225,18 @@ public class UserService implements UserDetailsService {
     public OrderDetailDTO addOrder(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+        Address defAddress = addressRepository.findByUserAndActive(user, true)
+                .orElseThrow(() -> new OrderProcessException("User should have address to create an order"));
         LocalDateTime now = LocalDateTime.now();
         List<Cart> cartItems = user.getCarts();
         if (cartItems.isEmpty()) {
             throw new OrderProcessException("The cart doesn't contain any items");
+        }
+
+        for (Cart cart : cartItems) {
+            if (cart.getQuantity() > cart.getProduct().getStock()) {
+                throw new LimitedProductStockException("Product Stock Limited");
+            }
         }
         Double total = cartItems.stream().map(item -> item.getProduct().getPrice() * item.getQuantity())
                 .reduce(Double::sum).orElse(0.0);
@@ -254,6 +262,7 @@ public class UserService implements UserDetailsService {
         OrderDetailDTO orderDetailDTO = OrderDetailDTO.builder()
                 .response(response)
                 .order(OrderMapper.toDTO(savedOrder))
+                .address(AddressMapper.toDTO(defAddress))
                 .build();
         return orderDetailDTO;
     }
@@ -283,6 +292,46 @@ public class UserService implements UserDetailsService {
         address.setUser(user);
         address.setCreatedAt(now);
         address.setUpdatedAt(now);
+        return AddressMapper.toDTO(addressRepository.save(address));
+    }
+
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#userId)")
+    public void removeAddress(int addressId, UUID userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + userId.toString()));
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address: " +
+                        addressId));
+        addressRepository.delete(address);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('USER') and authentication.principal.id.equals(#userId)")
+    public AddressResponseDTO updateAddress(AddressRequestDTO addressRequestDTO, int addressId, UUID userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User: " + userId.toString()));
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address: " + addressId));
+        address.setFirstName(addressRequestDTO.getFirstName());
+        address.setLastName(addressRequestDTO.getLastName());
+        address.setState(addressRequestDTO.getState());
+        address.setCity(addressRequestDTO.getCity());
+        address.setStreet(addressRequestDTO.getStreet());
+        address.setZipCode(addressRequestDTO.getZipCode());
+        address.setCountry(addressRequestDTO.getCountry());
+        address.setPhone(addressRequestDTO.getPhone());
+        address.setActive(addressRequestDTO.isActive());
+        address.setUpdatedAt(LocalDateTime.now());
+
+        if (Boolean.TRUE.equals(address.getActive())) {
+            Optional<Address> defaultAddress = addressRepository.findByUserAndActive(address.getUser(), true);
+            if (defaultAddress.isPresent() && !defaultAddress.get().getId().equals(address.getId())) {
+                Address defAddress = defaultAddress.get();
+                defAddress.setActive(false);
+                addressRepository.save(defAddress);
+            }
+        }
+
         return AddressMapper.toDTO(addressRepository.save(address));
     }
 
