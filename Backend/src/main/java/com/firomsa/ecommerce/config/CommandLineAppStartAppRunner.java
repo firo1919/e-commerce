@@ -6,7 +6,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.RoleRepository;
@@ -29,10 +28,11 @@ public class CommandLineAppStartAppRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (!userRepository.existsByEmail(adminProperties.getEmail()) && !userRepository.existsByUsername(adminProperties.getUsername())) {
+        if (!userRepository.existsByEmail(adminProperties.getEmail())
+                && !userRepository.existsByUsername(adminProperties.getUsername())) {
             LocalDateTime now = LocalDateTime.now();
             Role role = roleRepository.findByName("ADMIN")
-                    .orElseThrow(() -> new ResourceNotFoundException("Role: ADMIN"));
+                    .orElseGet(() -> roleRepository.save(Role.builder().name("ADMIN").build()));
             User admin = User.builder()
                     .username(adminProperties.getUsername())
                     .email(adminProperties.getEmail())
