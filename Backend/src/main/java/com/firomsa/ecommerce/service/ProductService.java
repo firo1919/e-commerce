@@ -19,7 +19,6 @@ import com.firomsa.ecommerce.mapper.ProductMapper;
 import com.firomsa.ecommerce.mapper.ReviewMapper;
 import com.firomsa.ecommerce.model.Category;
 import com.firomsa.ecommerce.model.Product;
-import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.repository.CategoryRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 
