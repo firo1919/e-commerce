@@ -34,9 +34,7 @@ jobs:
                   file: ./Backend/docker/Dockerfile
                   push: true
                   tags: firo1919/ecommerce-backend:dev
-                  platforms: linux/amd64,linux/arm64
-                  cache-from: type=registry,ref=firo1919/ecommerce-backend:dev
-                  cache-to: type=registry,ref=firo1919/ecommerce-backend:dev,mode=max
+
     render:
         needs: docker
         runs-on: ubuntu-latest
