@@ -2,7 +2,7 @@ services:
     app:
         env_file:
             - ../.env
-        image: firo1919/ecommerce-backend:prod
+        image: firo1919/ecommerce-backend:v1-prod
         networks:
             - app
         volumes:

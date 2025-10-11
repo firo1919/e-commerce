@@ -3,10 +3,10 @@ name: Deploy Backend Dev
 on:
     push:
         branches:
-            - dev
+            - main
     pull_request:
         branches:
-            - dev
+            - main
 
 jobs:
     docker:
@@ -33,7 +33,7 @@ jobs:
                   context: ./Backend
                   file: ./Backend/docker/Dockerfile
                   push: true
-                  tags: firo1919/ecommerce-backend:${{ vars.API_VERSION }}-dev
+                  tags: firo1919/ecommerce-backend:${{ vars.API_VERSION }}-prod
 
     render:
         needs: docker
@@ -42,5 +42,5 @@ jobs:
             - name: Deploy to dev
               uses: johnbeynon/render-deploy-action@v0.0.8
               with:
-                  service-id: ${{ secrets.RENDER_SERVICE_ID_DEV }}
+                  service-id: ${{ secrets.RENDER_SERVICE_ID_PROD }}
                   api-key: ${{ secrets.RENDER_API_KEY }}

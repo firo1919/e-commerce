@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.firomsa.ecommerce.service.JWTAuthService;
+import com.firomsa.ecommerce.v1.service.JWTAuthService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
