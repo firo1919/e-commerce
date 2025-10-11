@@ -1,0 +1,13 @@
+services:
+    db:
+        image: mariadb:latest
+        env_file:
+            - ../.env.db
+        restart: always
+        ports:
+            - 3306:3306
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 4000:8080

@@ -1,0 +1,38 @@
+package com.firomsa.ecommerce.v1.mapper;
+
+import java.time.LocalDateTime;
+
+import com.firomsa.ecommerce.model.User;
+import com.firomsa.ecommerce.v1.dto.UserRequestDTO;
+import com.firomsa.ecommerce.v1.dto.UserResponseDTO;
+
+public class UserMapper {
+
+    private UserMapper() {
+    }
+
+    public static UserResponseDTO toDTO(User user) {
+        return UserResponseDTO.builder()
+                .id(user.getId().toString())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .role(user.getRole().getName())
+                .active(user.isActive())
+                .build();
+    }
+
+    public static User toModel(UserRequestDTO userRequestDTO) {
+        LocalDateTime now = LocalDateTime.now();
+        return User.builder()
+                .lastName(userRequestDTO.getLastName())
+                .firstName(userRequestDTO.getFirstName())
+                .username(userRequestDTO.getUsername())
+                .email(userRequestDTO.getEmail())
+                .password(userRequestDTO.getPassword())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+}
