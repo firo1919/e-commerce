@@ -4,6 +4,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,7 +32,6 @@ import com.firomsa.ecommerce.v1.service.UserService;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
 class UserControllerTest {
 
     @MockitoBean
@@ -48,14 +47,17 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private Role role;
+
     private User firstUser;
+
     private User secondUser;
+
     private UserRequestDTO userRequestDTO;
 
     @BeforeEach
     void setup() {
-
         role = Role.builder().name("USER").id(1).build();
+
         firstUser = User.builder()
                 .id(UUID.randomUUID())
                 .username("firo")
@@ -88,32 +90,49 @@ class UserControllerTest {
     }
 
     @Test
-    public void UserController_GetAllUsers_ReturnsListOfUsers() throws Exception {
+    public void UserController_GetAllUsers_ReturnsListOfUsers()
+            throws Exception {
         // Arrange
-        List<UserResponseDTO> responseDTO = List.of(UserMapper.toDTO(firstUser),
+
+        List<UserResponseDTO> responseDTO = List.of(
+                UserMapper.toDTO(firstUser),
                 UserMapper.toDTO(secondUser));
 
         given(userService.getAll()).willReturn(responseDTO);
 
         // Act and Assert
-        mockMvc.perform(get("/api/v1/users")
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc
+                .perform(
+                        get("/api/v1/users").contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
-                .andExpect(jsonPath("$[0].username",
-                        CoreMatchers.is(responseDTO.getFirst().getUsername())))
-                .andExpect(jsonPath("$[0].email",
-                        CoreMatchers.is(responseDTO.getFirst().getEmail())))
-                .andExpect(jsonPath("$[0].firstName",
-                        CoreMatchers.is(responseDTO.getFirst().getFirstName())))
-                .andExpect(jsonPath("$[0].lastName",
-                        CoreMatchers.is(responseDTO.getFirst().getLastName())))
-                .andExpect(jsonPath("$[0].active",
-                        CoreMatchers.is(responseDTO.getFirst().isActive())))
-                .andExpect(jsonPath("$[0].role",
-                        CoreMatchers.is(responseDTO.getFirst().getRole())));
+                .andExpect(
+                        jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].username",
+                                CoreMatchers.is(responseDTO.getFirst().getUsername())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].email",
+                                CoreMatchers.is(responseDTO.getFirst().getEmail())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].firstName",
+                                CoreMatchers.is(responseDTO.getFirst().getFirstName())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].lastName",
+                                CoreMatchers.is(responseDTO.getFirst().getLastName())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].active",
+                                CoreMatchers.is(responseDTO.getFirst().isActive())))
+                .andExpect(
+                        jsonPath(
+                                "$[0].role",
+                                CoreMatchers.is(responseDTO.getFirst().getRole())));
 
         verify(userService, times(1)).getAll();
     }
-
 }
