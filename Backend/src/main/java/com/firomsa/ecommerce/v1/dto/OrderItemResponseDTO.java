@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class OrderItemResponseDTO {
-    private Long id;
-    private Long orderId;
+    private Integer id;
+    private Integer orderId;
     private String productId;
     private double priceAtPurchase;
     private int quantity;

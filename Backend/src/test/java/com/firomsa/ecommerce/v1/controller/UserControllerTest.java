@@ -1,24 +1,37 @@
 package com.firomsa.ecommerce.v1.controller;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 import java.util.UUID;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firomsa.ecommerce.model.Role;
 import com.firomsa.ecommerce.model.User;
 import com.firomsa.ecommerce.security.JWTSecurityFilter;
 import com.firomsa.ecommerce.v1.dto.UserRequestDTO;
+import com.firomsa.ecommerce.v1.dto.UserResponseDTO;
+import com.firomsa.ecommerce.v1.mapper.UserMapper;
 import com.firomsa.ecommerce.v1.service.JWTAuthService;
 import com.firomsa.ecommerce.v1.service.UserService;
 
 @WebMvcTest(UserController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class UserControllerTest {
 
@@ -34,155 +47,73 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private Role role;
+    private User firstUser;
+    private User secondUser;
+    private UserRequestDTO userRequestDTO;
 
-    private final Role role = Role.builder().name("USER").id(1).build();
-    private final User firstUser = User.builder()
-            .id(UUID.randomUUID())
-            .username("firo")
-            .email("example@gmail.com")
-            .firstName("Firomsa")
-            .lastName("Assefa")
-            .password("123")
-            .role(role)
-            .active(true)
-            .build();
+    @BeforeEach
+    void setup() {
 
-    private final User secondUser = User.builder()
-            .id(UUID.randomUUID())
-            .username("firo")
-            .email("example@gmail.com")
-            .firstName("Firomsa")
-            .lastName("Assefa")
-            .password("123")
-            .role(role)
-            .active(true)
-            .build();
+        role = Role.builder().name("USER").id(1).build();
+        firstUser = User.builder()
+                .id(UUID.randomUUID())
+                .username("firo")
+                .email("example@gmail.com")
+                .firstName("Firomsa")
+                .lastName("Assefa")
+                .password("123")
+                .role(role)
+                .active(true)
+                .build();
 
-    private final UserRequestDTO userRequestDTO = UserRequestDTO.builder()
-            .username("firo")
-            .email("example@gmail.com")
-            .firstName("Firomsa")
-            .lastName("Assefa")
-            .password("123")
-            .build();
+        secondUser = User.builder()
+                .id(UUID.randomUUID())
+                .username("firo")
+                .email("example@gmail.com")
+                .firstName("Firomsa")
+                .lastName("Assefa")
+                .password("123")
+                .role(role)
+                .active(true)
+                .build();
 
-    // @Test
-    // @WithMockUser(username = "admin", roles = { "ADMIN" })
-    // public void UserController_GetAllUsers_ReturnsListOfUsers() throws Exception
-    // {
-    // List<UserResponseDTO> responseDTO = List.of(UserMapper.toDTO(firstUser),
-    // UserMapper.toDTO(secondUser));
+        userRequestDTO = UserRequestDTO.builder()
+                .username("firo")
+                .email("example@gmail.com")
+                .firstName("Firomsa")
+                .lastName("Assefa")
+                .password("123")
+                .build();
+    }
 
-    // given(userService.getAll()).willReturn(responseDTO);
+    @Test
+    public void UserController_GetAllUsers_ReturnsListOfUsers() throws Exception {
+        // Arrange
+        List<UserResponseDTO> responseDTO = List.of(UserMapper.toDTO(firstUser),
+                UserMapper.toDTO(secondUser));
 
-    // ResultActions response = this.mockMvc.perform(get("/api/users")
-    // .contentType(MediaType.APPLICATION_JSON));
+        given(userService.getAll()).willReturn(responseDTO);
 
-    // response.andExpect(status().isOk())
-    // .andExpect(jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
-    // .andExpect(jsonPath("$[0].userName",
-    // CoreMatchers.is(responseDTO.getFirst().getUsername())))
-    // .andExpect(jsonPath("$[0].email",
-    // CoreMatchers.is(responseDTO.getFirst().getEmail())))
-    // .andExpect(jsonPath("$[0].firstName",
-    // CoreMatchers.is(responseDTO.getFirst().getFirstName())));
-    // }
+        // Act and Assert
+        mockMvc.perform(get("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", CoreMatchers.is(responseDTO.size())))
+                .andExpect(jsonPath("$[0].username",
+                        CoreMatchers.is(responseDTO.getFirst().getUsername())))
+                .andExpect(jsonPath("$[0].email",
+                        CoreMatchers.is(responseDTO.getFirst().getEmail())))
+                .andExpect(jsonPath("$[0].firstName",
+                        CoreMatchers.is(responseDTO.getFirst().getFirstName())))
+                .andExpect(jsonPath("$[0].lastName",
+                        CoreMatchers.is(responseDTO.getFirst().getLastName())))
+                .andExpect(jsonPath("$[0].active",
+                        CoreMatchers.is(responseDTO.getFirst().isActive())))
+                .andExpect(jsonPath("$[0].role",
+                        CoreMatchers.is(responseDTO.getFirst().getRole())));
 
-    // @Test
-    // public void UserController_GetUser_ReturnUser() throws Exception {
-    // User user = UserMapper.toModel(getUserRequestDTO("kira",
-    // "example2@gmail.com", "Kirubel"));
-    // user.setId(UUID.randomUUID());
-    // user.setRole(Role.builder().name("USER").id(1).build());
-    // UserResponseDTO responseDTO = UserMapper.toDTO(user);
+        verify(userService, times(1)).getAll();
+    }
 
-    // given(userService.get(user.getId())).willReturn(responseDTO);
-
-    // ResultActions response = this.mockMvc.perform(get("/api/users/{id}",
-    // user.getId())
-    // .contentType(MediaType.APPLICATION_JSON));
-
-    // response.andExpect(status().isOk())
-    // .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-    // .andExpect(jsonPath("$.userName",
-    // CoreMatchers.is(responseDTO.getUsername())))
-    // .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
-    // .andExpect(jsonPath("$.firstName",
-    // CoreMatchers.is(responseDTO.getFirstName())));
-    // }
-
-    // @Test
-    // public void UserController_AddUser_ReturnCreatedUser() throws Exception {
-    // UserRequestDTO userRequestDTO = getUserRequestDTO("kira",
-    // "example2@gmail.com", "Kirubel");
-    // User user = UserMapper.toModel(userRequestDTO);
-    // user.setId(UUID.randomUUID());
-    // user.setRole(Role.builder().name("USER").id(1).build());
-    // UserResponseDTO responseDTO = UserMapper.toDTO(user);
-
-    // given(userService.create(Mockito.any(UserRequestDTO.class))).willReturn(responseDTO);
-
-    // ResultActions response = this.mockMvc.perform(post("/api/users")
-    // .contentType(MediaType.APPLICATION_JSON)
-    // .content(objectMapper.writeValueAsString(userRequestDTO)));
-
-    // response.andExpect(status().isCreated())
-    // .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-    // .andExpect(jsonPath("$.userName",
-    // CoreMatchers.is(responseDTO.getUsername())))
-    // .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
-    // .andExpect(jsonPath("$.firstName",
-    // CoreMatchers.is(responseDTO.getFirstName())));
-    // }
-
-    // @Test
-    // public void UserController_UpdateUser_ReturnUpdatedUser() throws Exception {
-    // UserRequestDTO userRequestDTO = getUserRequestDTO("kira",
-    // "example2@gmail.com", "Kirubel");
-    // User user = UserMapper.toModel(userRequestDTO);
-    // user.setId(UUID.randomUUID());
-    // user.setRole(Role.builder().name("USER").id(1).build());
-    // UserResponseDTO responseDTO = UserMapper.toDTO(user);
-
-    // given(userService.update(Mockito.any(UserRequestDTO.class),
-    // Mockito.any(UUID.class)))
-    // .willReturn(responseDTO);
-
-    // ResultActions response = this.mockMvc.perform(put("/api/users/{id}",
-    // user.getId())
-    // .contentType(MediaType.APPLICATION_JSON)
-    // .content(objectMapper.writeValueAsString(userRequestDTO)));
-
-    // response.andExpect(status().isOk())
-    // .andExpect(jsonPath("$.id", CoreMatchers.is(responseDTO.getId())))
-    // .andExpect(jsonPath("$.userName",
-    // CoreMatchers.is(responseDTO.getUsername())))
-    // .andExpect(jsonPath("$.email", CoreMatchers.is(responseDTO.getEmail())))
-    // .andExpect(jsonPath("$.firstName",
-    // CoreMatchers.is(responseDTO.getFirstName())));
-    // }
-
-    // @Test
-    // public void UserController_DeleteUser_ReturnNothing() throws Exception {
-    // UUID id = UUID.randomUUID();
-    // doNothing().when(userService).remove(Mockito.any(UUID.class));
-
-    // ResultActions response = this.mockMvc.perform(delete("/api/users/{id}", id)
-    // .contentType(MediaType.APPLICATION_JSON));
-
-    // response.andExpect(status().isNoContent());
-    // }
-
-    // private static UserRequestDTO getUserRequestDTO(String userName, String
-    // email, String firstName) {
-    // return UserRequestDTO.builder()
-    // .username(userName)
-    // .email(email)
-    // .firstName(firstName)
-    // .lastName("Assefa")
-    // .password("123")
-    // .build();
-    // }
 }
