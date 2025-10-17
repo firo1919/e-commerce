@@ -30,8 +30,6 @@ services:
             - app
         volumes:
             - app_images:/store/images
-        ports:
-            - "8080:8080"
         depends_on:
             db:
                 condition: service_healthy
