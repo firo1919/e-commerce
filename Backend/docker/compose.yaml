@@ -1,7 +1,7 @@
 services:
     app:
         build:
-            context: ../
+            context: .
             dockerfile: docker/Dockerfile
         environment:
             - ADMIN_EMAIL
