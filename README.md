@@ -76,7 +76,7 @@ A comprehensive, full-stack e-commerce platform built with Spring Boot, featurin
 ```
 e-commerce/
 ├── .github/
-│   └── workflows/           # GitHub Actions CI/CD
+│   └── workflows/           # GitHub Actions CI/CD with render
 │       ├── deploy-backend-dev.yml
 │       └── deploy-backend-prod.yml
 ├── Backend/
@@ -168,7 +168,7 @@ e-commerce/
 
 ```bash
 cd Backend
-docker compose -f docker/compose.yaml up -d
+docker compose -f docker/compose.local.yaml up -d
 ```
 
 This will start both the application and MariaDB database automatically.
