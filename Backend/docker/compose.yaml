@@ -1,8 +1,11 @@
 services:
     app:
+        build:
+            context: ../
+            dockerfile: Dockerfile
         env_file:
             - ../.env
-        image: firo1919/ecommerce-backend:v1-prod
+        image: firo1919/ecommerce-backend
         networks:
             - app
         volumes:
