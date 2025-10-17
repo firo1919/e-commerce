@@ -12,13 +12,13 @@ import com.firomsa.ecommerce.repository.RoleRepository;
 import com.firomsa.ecommerce.repository.UserRepository;
 
 @Component
-public class CommandLineAppStartAppRunner implements CommandLineRunner {
+public class AdminSetup implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final DefaultAdminConfig adminProperties;
 
-    public CommandLineAppStartAppRunner(UserRepository userRepository, RoleRepository roleRepository,
+    public AdminSetup(UserRepository userRepository, RoleRepository roleRepository,
             PasswordEncoder passwordEncoder, DefaultAdminConfig adminProperties) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
