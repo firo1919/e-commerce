@@ -1,37 +1,55 @@
 services:
-  app:
-    env_file:
-      - ../.env
-    image: firo1919/ecommerce-backend:V1-prod
-    networks:
-      - app
-    volumes:
-      - app_images:/store/images
-    ports:
-      - "8080:8080"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: unless-stopped
-  db:
-    env_file:
-      - ../.env.db
-    image: "mariadb:latest"
-    restart: unless-stopped
-    volumes:
-      - db_data_prod:/var/lib/mysql
-    networks:
-      - app
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+    app:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        environment:
+            - ADMIN_EMAIL
+            - ADMIN_FIRSTNAME
+            - ADMIN_LASTNAME
+            - ADMIN_PASSWORD
+            - ADMIN_USERNAME
+            - AUTH_SECRET
+            - CHAPA_ENCRIPTION_KEY
+            - CHAPA_SECRET_KEY
+            - COMPANY_MAIL
+            - LOGGING_LEVEL_ROOT
+            - SPRING_DATASOURCE_PASSWORD
+            - SPRING_DATASOURCE_URL
+            - SPRING_DATASOURCE_USERNAME
+            - SPRING_JPA_DEFERDATASOURCEINITIALIZATION
+            - SPRING_JPA_HIBERNATE_DDLAUTO
+            - SPRING_MAIL_PASSWORD
+            - SPRING_MAIL_USERNAME
+            - SPRING_SQL_INIT_CONTINUEONERROR
+            - SPRING_SQL_INIT_MODE
+            - SPRINGDOC_APIDOCS_ENABLED
+
+        image: firo1919/ecommerce-backend
+        volumes:
+            - app_images:/store/images
+        depends_on:
+            db:
+                condition: service_healthy
+        restart: unless-stopped
+    db:
+        environment:
+            - MARIADB_DATABASE
+            - MARIADB_PASSWORD
+            - MARIADB_ROOT_PASSWORD
+            - MARIADB_USER
+
+        image: "mariadb:latest"
+        restart: unless-stopped
+        volumes:
+            - db_data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
 
 volumes:
-  db_data_prod:
-  app_images:
-
-networks:
-  app:
+    db_data:
+    app_images:
