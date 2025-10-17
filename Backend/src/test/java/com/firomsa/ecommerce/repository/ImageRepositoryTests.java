@@ -78,7 +78,7 @@ public class ImageRepositoryTests {
     @Test
     public void ImageRepository_FindById_ReturnEmpty() {
         // Arrange
-        Long nonExistentId = 999L;
+        Integer nonExistentId = 999;
 
         // Act
         Optional<Image> foundImage = imageRepository.findById(nonExistentId);

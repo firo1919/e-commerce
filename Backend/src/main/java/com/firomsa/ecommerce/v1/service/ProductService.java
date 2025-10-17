@@ -120,7 +120,7 @@ public class ProductService {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ReviewResponseDTO> getReviews(UUID id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
         return product.getReviews().stream().map(ReviewMapper::toDTO).toList();
     }
 

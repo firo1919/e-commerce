@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
