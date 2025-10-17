@@ -162,6 +162,14 @@ e-commerce/
     CHAPA_ENCRIPTION_KEY=your-chapa-encryption-key
     ```
 
+    Also create the `.env.db` file with the following content
+   ```
+   MARIADB_DATABASE=ecommerce
+   MARIADB_PASSWORD=your-password
+   MARIADB_ROOT_PASSWORD=your-root-password
+   MARIADB_USER=admin
+   ```
+
 ### Running the Application
 
 #### Using Docker Compose (Recommended for Local Development)
