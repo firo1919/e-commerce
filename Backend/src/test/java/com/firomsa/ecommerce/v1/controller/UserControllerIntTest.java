@@ -14,8 +14,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -27,7 +25,6 @@ import com.firomsa.ecommerce.v1.dto.UserResponseDTO;
 import com.firomsa.ecommerce.v1.service.JWTAuthService;
 
 @Testcontainers
-@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerIntTest {
 
@@ -85,10 +82,12 @@ class UserControllerIntTest {
     }
 
     @Test
-    @Rollback
     void UserController_GetAllUsers_ReturnsListOfUsers() {
         // Arrange
-        userRepository.saveAll(List.of(firstUser, secondUser, userAgent));
+        userRepository.saveAll(List.of(firstUser, secondUser));
+        userRepository.findAll()
+                .forEach(user -> System.out.println(user.getUsername() + " - " + user.getRole().getName()));
+
         String token = jwtAuthService.generateToken("firo");
 
         // Act
@@ -102,6 +101,6 @@ class UserControllerIntTest {
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(200);
         List<UserResponseDTO> body = List.of(response.getBody());
-        assertThat(body).hasSize(2);
+        assertThat(body).hasSize(3);
     }
 }
