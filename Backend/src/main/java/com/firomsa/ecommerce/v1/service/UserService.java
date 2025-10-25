@@ -228,7 +228,7 @@ public class UserService implements UserDetailsService {
         Address defAddress = addressRepository.findByUserAndActive(user, true)
                 .orElseThrow(() -> new OrderProcessException("User should have address to create an order"));
         LocalDateTime now = LocalDateTime.now();
-        List<Cart> cartItems = user.getCarts();
+        List<Cart> cartItems = cartRepository.findAllByUser(user);
         if (cartItems.isEmpty()) {
             throw new OrderProcessException("The cart doesn't contain any items");
         }

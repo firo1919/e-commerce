@@ -22,10 +22,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.model.Category;
+import com.firomsa.ecommerce.model.Image;
 import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.repository.CategoryRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 import com.firomsa.ecommerce.v1.dto.CategoryRequestDTO;
+import com.firomsa.ecommerce.v1.dto.ImageDTO;
 import com.firomsa.ecommerce.v1.dto.ProductRequestDTO;
 import com.firomsa.ecommerce.v1.dto.ProductResponseDTO;
 
@@ -149,6 +151,33 @@ public class ProductServiceTests {
         assertThatThrownBy(() -> productService.create(productRequestDTO))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Category: Electronics");
+    }
+
+    @Test
+    public void ProductService_GetProductImages_ReturnsImages() {
+        // Arrange
+        Image image = Image.builder().id(1).name("img.png").product(product).build();
+        product.setProductImages(List.of(image));
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
+
+        // Act
+        List<ImageDTO> result = productService.getProductImages(product.getId());
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(1);
+        verify(productRepository, times(1)).findById(product.getId());
+    }
+
+    @Test
+    public void ProductService_GetProductImages_Throws_WhenProductNotFound() {
+        // Arrange
+        given(productRepository.findById(product.getId())).willReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> productService.getProductImages(product.getId()))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Product: " + product.getId().toString());
     }
 
     @Test

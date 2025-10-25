@@ -608,6 +608,7 @@ public class UserServiceTests {
         // Arrange
         firstUser.setCarts(List.of(testCart));
         given(userRepository.findById(firstUser.getId())).willReturn(Optional.of(firstUser));
+        given(cartRepository.findAllByUser(firstUser)).willReturn(List.of(testCart));
         given(addressRepository.findByUserAndActive(firstUser, true)).willReturn(Optional.of(testAddress));
         given(orderRepository.save(any(Order.class))).willReturn(testOrder);
         given(orderItemRepository.saveAll(any())).willReturn(List.of());
@@ -660,6 +661,36 @@ public class UserServiceTests {
         assertThatThrownBy(() -> userService.addOrder(firstUser.getId()))
                 .isInstanceOf(OrderProcessException.class)
                 .hasMessage("The cart doesn't contain any items");
+    }
+
+    @Test
+    public void UserService_AddOrder_ShouldThrowException_WhenProductStockLimited() {
+        // Arrange
+        Product limitedStockProduct = Product.builder()
+                .id(UUID.randomUUID())
+                .name("Limited Stock Product")
+                .price(100.0)
+                .stock(1)
+                .build();
+
+        Cart limitedStockCart = Cart.builder()
+                .id(2)
+                .quantity(2)
+                .user(firstUser)
+                .product(limitedStockProduct)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        firstUser.setCarts(List.of(limitedStockCart));
+        given(userRepository.findById(firstUser.getId())).willReturn(Optional.of(firstUser));
+        given(cartRepository.findAllByUser(firstUser)).willReturn(List.of(limitedStockCart));
+        given(addressRepository.findByUserAndActive(firstUser, true)).willReturn(Optional.of(testAddress));
+
+        // Act and Assert
+        assertThatThrownBy(() -> userService.addOrder(firstUser.getId()))
+                .isInstanceOf(LimitedProductStockException.class)
+                .hasMessage("Product Stock Limited");
     }
 
     @Test
@@ -954,35 +985,6 @@ public class UserServiceTests {
         verify(userRepository, times(1)).findById(firstUser.getId());
         verify(productRepository, times(1)).findById(testProduct.getId());
         verify(cartRepository, times(1)).save(any(Cart.class));
-    }
-
-    @Test
-    public void UserService_AddOrder_ShouldThrowException_WhenProductStockLimited() {
-        // Arrange
-        Product limitedStockProduct = Product.builder()
-                .id(UUID.randomUUID())
-                .name("Limited Stock Product")
-                .price(100.0)
-                .stock(1)
-                .build();
-
-        Cart limitedStockCart = Cart.builder()
-                .id(2)
-                .quantity(2)
-                .user(firstUser)
-                .product(limitedStockProduct)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        firstUser.setCarts(List.of(limitedStockCart));
-        given(userRepository.findById(firstUser.getId())).willReturn(Optional.of(firstUser));
-        given(addressRepository.findByUserAndActive(firstUser, true)).willReturn(Optional.of(testAddress));
-
-        // Act and Assert
-        assertThatThrownBy(() -> userService.addOrder(firstUser.getId()))
-                .isInstanceOf(LimitedProductStockException.class)
-                .hasMessage("Product Stock Limited");
     }
 
     @Test

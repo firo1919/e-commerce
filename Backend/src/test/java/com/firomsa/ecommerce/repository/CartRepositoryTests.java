@@ -159,6 +159,37 @@ public class CartRepositoryTests {
     }
 
     @Test
+    public void CartRepository_FindAllByUser_ReturnCarts() {
+        // Arrange
+        User savedUser = userRepository.save(testUser);
+        Product savedProduct = productRepository.save(testProduct);
+        Cart cart = testCart;
+        cart.setUser(savedUser);
+        cart.setProduct(savedProduct);
+        cartRepository.save(cart);
+
+        // Act
+        List<Cart> foundCart = cartRepository.findAllByUser(savedUser);
+
+        // Assert
+        assertThat(foundCart).isNotNull();
+        assertThat(foundCart.get(0)).usingRecursiveComparison().isEqualTo(cart);
+        assertThat(foundCart.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void CartRepository_FindAllByUser_ReturnEmpty() {
+        // Arrange
+        User savedUser = userRepository.save(testUser);
+
+        // Act
+        List<Cart> foundCart = cartRepository.findAllByUser(savedUser);
+
+        // Assert
+        assertThat(foundCart).isEmpty();
+    }
+
+    @Test
     public void CartRepository_DeleteAllByUser_DeleteAllUserCarts() {
         // Arrange
         User savedUser = userRepository.save(testUser);
