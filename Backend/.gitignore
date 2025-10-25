@@ -3,7 +3,9 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-*.env
+.env
+.env.local
+.env.db
 src/main/resources/certs/*
 
 ### STS ###

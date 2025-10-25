@@ -143,7 +143,9 @@ public class AuthController {
     @Operation(summary = "For logging out a user")
     @PostMapping("/logout")
     public ResponseEntity<Void> revokeRefreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
-        refreshTokenRepository.deleteById(UUID.fromString(refreshTokenDTO.getRefreshToken()));
+        RefreshToken refreshToken = refreshTokenRepository.findById(UUID.fromString(refreshTokenDTO.getRefreshToken()))
+                .orElseThrow(() -> new ResourceNotFoundException("RefreshToken: " + refreshTokenDTO.getRefreshToken()));
+        refreshTokenRepository.delete(refreshToken);
         return ResponseEntity.noContent().build();
     }
 }

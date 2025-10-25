@@ -12,13 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.firomsa.ecommerce.exception.ResourceNotFoundException;
 import com.firomsa.ecommerce.model.Category;
+import com.firomsa.ecommerce.model.Image;
 import com.firomsa.ecommerce.model.Product;
 import com.firomsa.ecommerce.repository.CategoryRepository;
 import com.firomsa.ecommerce.repository.ProductRepository;
 import com.firomsa.ecommerce.v1.dto.CategoryRequestDTO;
+import com.firomsa.ecommerce.v1.dto.ImageDTO;
 import com.firomsa.ecommerce.v1.dto.ProductRequestDTO;
 import com.firomsa.ecommerce.v1.dto.ProductResponseDTO;
 import com.firomsa.ecommerce.v1.dto.ReviewResponseDTO;
+import com.firomsa.ecommerce.v1.mapper.ImageMapper;
 import com.firomsa.ecommerce.v1.mapper.ProductMapper;
 import com.firomsa.ecommerce.v1.mapper.ReviewMapper;
 
@@ -100,6 +103,14 @@ public class ProductService {
         return ProductMapper.toDTO(productRepository.save(product));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public List<ImageDTO> getProductImages(UUID id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
+        List<Image> images = product.getProductImages();
+        return images.stream().map(ImageMapper::toDTO).toList();
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     public void remove(UUID id) {
         Product product = productRepository.findById(id)
@@ -120,7 +131,7 @@ public class ProductService {
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public List<ReviewResponseDTO> getReviews(UUID id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User: " + id.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
         return product.getReviews().stream().map(ReviewMapper::toDTO).toList();
     }
 

@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         log.warn("resource with this id doesnt exist: {} ", exception.getMessage());
         error.put("message", "resource with this id doesnt exist " + exception.getMessage());
 
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(StorageException.class)

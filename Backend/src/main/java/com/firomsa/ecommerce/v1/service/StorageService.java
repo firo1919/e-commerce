@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.core.io.Resource;
@@ -38,14 +37,6 @@ public class StorageService {
     public StorageService(ProductRepository productRepository, ImageRepository imageRepository) {
         this.productRepository = productRepository;
         this.imageRepository = imageRepository;
-    }
-
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public List<ImageDTO> getProductImages(UUID id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product: " + id.toString()));
-        List<Image> images = product.getProductImages();
-        return images.stream().map(ImageMapper::toDTO).toList();
     }
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
