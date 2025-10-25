@@ -91,7 +91,7 @@ public class ProductController {
     @Operation(summary = "For getting all product images")
     @GetMapping("/{id}/productImages")
     public ResponseEntity<List<ImageDTO>> getAllProductImages(@PathVariable UUID id) {
-        List<ImageDTO> images = storageService.getProductImages(id);
+        List<ImageDTO> images = productService.getProductImages(id);
         return ResponseEntity.ok().body(images);
     }
 
